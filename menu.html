@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Menu Sản Phẩm - Bông Trà</title>
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root { --main-green: #006030; }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #fbf9f5 url('https://www.transparenttextures.com/patterns/paper.png');
+      color: #333;
+      padding-top: 75px;
+      scroll-behavior: smooth;
+    }
+
+    /* 4 KHỐI BANNER ĐẦU TRANG SỬ DỤNG ẢNH NỀN NEN-1 VÀ NEN-2 XEN KẼ */
+    .menu-hero-block {
+      min-height: 420px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      position: relative;
+      background-size: cover;
+      background-position: center;
+      color: #fff;
+    }
+    .bg-nen-1 { background-image: url('/image/nen-1.jpg'); }
+    .bg-nen-2 { background-image: url('/image/nen-2.jpg'); }
+
+    .menu-hero-block::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.25);
+      z-index: 1;
+    }
+    .menu-hero-block > * { position: relative; z-index: 2; }
+
+    .hero-content { max-width: 480px; }
+    .hero-title { font-size: 36px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+    .hero-desc { font-size: 13.5px; line-height: 1.6; opacity: 0.95; margin-bottom: 20px; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+    
+    .btn-explore {
+      border: 1px solid #fff;
+      color: #fff;
+      background: transparent;
+      padding: 8px 22px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 13px;
+      text-decoration: none;
+      display: inline-block;
+      transition: 0.3s;
+    }
+    .btn-explore:hover { background: #fff; color: #006030; }
+
+    .hero-cup-img {
+      max-height: 300px;
+      object-fit: contain;
+      transition: transform 0.3s ease;
+      filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));
+    }
+    .hero-cup-img:hover { transform: scale(1.05); }
+
+    /* THANH DOT NAVIGATION BÊN TRÁI */
+    .section-nav-sidebar {
+      position: fixed;
+      left: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .nav-dot-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: #006030;
+      font-weight: 700;
+      font-size: 12px;
+      opacity: 0.6;
+      transition: 0.3s;
+    }
+    .nav-dot-item .dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background-color: #006030;
+      transition: 0.3s;
+    }
+    .nav-dot-item span { display: none; white-space: nowrap; background: #fff; padding: 2px 8px; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .nav-dot-item:hover span, .nav-dot-item.active span { display: inline-block; }
+    .nav-dot-item.active { opacity: 1; }
+    .nav-dot-item.active .dot { transform: scale(1.4); }
+
+    /* NÚT SCROLL TO TOP GÓC PHẢI */
+    .scroll-top-btn {
+      position: fixed;
+      right: 25px;
+      bottom: 25px;
+      width: 42px; height: 42px;
+      background-color: #006030;
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 9999;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      transition: 0.3s;
+      opacity: 0;
+      visibility: hidden;
+    }
+    .scroll-top-btn.show { opacity: 1; visibility: visible; }
+    .scroll-top-btn:hover { background-color: #004d26; transform: translateY(-3px); }
+
+    /* SECTION SẢN PHẨM */
+    .paper-section {
+      background: #fbf9f5 url('https://www.transparenttextures.com/patterns/paper.png');
+      padding: 60px 0;
+      border-bottom: 1px solid #eaeaea;
+    }
+
+    .section-category-title {
+      color: var(--main-green);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 5px;
+      text-align: center;
+    }
+
+    .section-category-desc {
+      text-align: center;
+      color: #666;
+      font-size: 13.5px;
+      max-width: 700px;
+      margin: 0 auto 40px auto;
+    }
+
+    .product-card {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      border: 1px solid #eaeaea;
+      transition: all 0.35s ease;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .product-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 30px rgba(0, 96, 48, 0.15);
+      border-color: var(--main-green);
+    }
+
+    .product-clickable-area { cursor: pointer; }
+
+    .badge-bestseller {
+      position: absolute;
+      top: 12px; right: 12px;
+      background-color: var(--main-green);
+      color: #ffffff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      z-index: 2;
+    }
+
+    .menu-img-box {
+      width: 100%;
+      height: 190px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      margin-bottom: 15px;
+    }
+
+    .menu-img {
+      max-height: 175px;
+      object-fit: contain;
+      transition: transform 0.3s ease;
+    }
+
+    .product-card:hover .menu-img { transform: scale(1.06); }
+
+    .menu-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: #1a1a1a;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .menu-desc {
+      font-size: 11.5px;
+      color: #777;
+      line-height: 1.5;
+      margin-bottom: 15px;
+      height: 35px;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+
+    .btn-product-cart {
+      width: 38px; height: 38px; border-radius: 50%; background: #e8f5e9; border: 1.5px solid #a5d6a7;
+      display: flex; align-items: center; justify-content: center; color: #006030; cursor: pointer; transition: 0.2s;
+    }
+    .btn-product-cart:hover { background: #006030; color: #fff; border-color: #006030; }
+
+    .product-qty-badge {
+      width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid #00b050;
+      display: flex; align-items: center; justify-content: center; color: #00b050; font-weight: 700; font-size: 14px; background: #fff;
+      cursor: pointer; transition: transform 0.2s;
+    }
+    .product-qty-badge:hover { transform: scale(1.1); background: #e8f5e9; }
+
+    /* MODAL THÔNG TIN SẢN PHẨM - KHẮC PHỤC TRIỆT ĐỂ LỖI ĐÈ CHỮ */
+    .product-modal-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6);
+      z-index: 99999; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: 0.3s;
+    }
+    .product-modal-overlay.active { opacity: 1; visibility: visible; }
+    
+    .product-modal-container {
+      background: #fff; width: 100%; max-width: 680px; border-radius: 8px;
+      overflow: hidden; position: relative; box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+      transform: translateY(20px); transition: transform 0.3s ease;
+      max-height: 90vh; display: flex; flex-direction: column;
+    }
+    .product-modal-overlay.active .product-modal-container { transform: translateY(0); }
+
+    .modal-top-bar {
+      display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid #eaeaea; flex-shrink: 0;
+    }
+    .modal-top-bar h5 { font-size: 18px; font-weight: 600; color: #222; margin: 0; }
+    .modal-close-x { background: none; border: none; font-size: 20px; color: #666; cursor: pointer; }
+
+    .modal-body-content {
+      display: flex; padding: 25px; gap: 25px; align-items: center; flex-shrink: 0;
+    }
+    
+    /* CỐ ĐỊNH KÍCH THƯỚC KHUNG ẢNH ĐỂ KHÔNG BỊ TRÀN */
+    .modal-img-wrapper {
+      background: #f7f7f7; border-radius: 8px; width: 260px; min-width: 260px; height: 220px; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; position: relative; z-index: 2;
+    }
+    .modal-img-wrapper img { width: 100%; height: 100%; object-fit: contain; }
+
+    .modal-info-wrapper { flex-grow: 1; position: relative; z-index: 2; }
+    .modal-product-name { font-size: 18px; font-weight: 800; color: #222; text-transform: uppercase; margin-bottom: 6px; }
+    .modal-price-tag { font-size: 20px; font-weight: 700; color: #008040; margin: 8px 0; }
+    .modal-desc-text { font-size: 13px; color: #666; line-height: 1.5; margin-bottom: 0; }
+
+    .modal-options-section { padding: 0 25px 10px; border-top: 1px solid #f0f0f0; margin-top: 5px; padding-top: 10px; overflow-y: auto; max-height: 160px; flex-shrink: 1; }
+    .modal-option-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 13px; cursor: pointer; border-bottom: 1px solid #f8f8f8; }
+
+    .modal-footer-action {
+      padding: 15px 25px; background: #fafafa; border-top: 1px solid #eaeaea; display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-shrink: 0;
+    }
+    .btn-add-to-cart-modal {
+      flex-grow: 1; background: #008040; color: #fff; border: none; border-radius: 6px; padding: 12px; font-weight: 700; font-size: 15px; cursor: pointer; transition: 0.2s;
+    }
+    .btn-add-to-cart-modal:hover { background: #006030; }
+
+    /* DRAWER GIỎ HÀNG */
+    .cart-drawer-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6);
+      z-index: 999999; display: flex; justify-content: flex-end; opacity: 0; visibility: hidden; transition: 0.3s;
+    }
+    .cart-drawer-overlay.active { opacity: 1; visibility: visible; }
+    .cart-drawer-container { background: #fff; width: 100%; max-width: 450px; height: 100%; display: flex; flex-direction: column; justify-content: space-between; transform: translateX(100%); transition: transform 0.3s ease; }
+    .cart-drawer-overlay.active .cart-drawer-container { transform: translateX(0); }
+    .cart-drawer-header { padding: 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+    .cart-drawer-body { padding: 20px; overflow-y: auto; flex-grow: 1; }
+    .cart-item-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
+    .cart-drawer-footer { padding: 20px; border-top: 1px solid #eee; background: #fff; }
+    .btn-checkout-main { width: 100%; background: #00b050; color: #fff; border: none; border-radius: 8px; padding: 14px; font-weight: 700; text-align: center; display: block; text-decoration: none; }
+  </style>
+</head>
+<body>
+
+  <!-- NẠP HEADER CHUNG -->
+  <div id="header-include"></div>
+
+  <!-- THANH DOT NAVIGATION BÊN TRÁI -->
+  <div class="section-nav-sidebar" id="sectionNavSidebar"></div>
+
+  <!-- NÚT SCROLL TO TOP GÓC PHẢI -->
+  <div class="scroll-top-btn" id="scrollTopBtn" onclick="scrollToTop()">
+    <i class="fa-solid fa-chevron-up"></i>
+  </div>
+
+  <!-- 4 KHỐI GIỚI THIỆU ĐẦU TRANG SỬ DỤNG ẢNH NỀN NEN-1 VÀ NEN-2 XEN KẼ -->
+  <div class="container-fluid px-0">
+    <div class="row g-0">
+      <div class="col-md-6 menu-hero-block bg-nen-1">
+        <div class="row align-items-center w-100 px-4">
+          <div class="col-7">
+            <div class="hero-content">
+              <h2 class="hero-title">MILK TEA</h2>
+              <p class="hero-desc">Từ những lá trà được tuyển chọn hòa quyện cùng sữa béo ngây, mang đến vị êm dịu ngay ngụm đầu.</p>
+              <a href="#milk-tea" class="btn-explore">KHÁM PHÁ THÊM</a>
+            </div>
+          </div>
+          <div class="col-5 text-center"><img src="/image/menu_tra.png" class="hero-cup-img" alt="Milk Tea"></div>
+        </div>
+      </div>
+      <div class="col-md-6 menu-hero-block bg-nen-2">
+        <div class="row align-items-center w-100 px-4">
+          <div class="col-5 text-center"><img src="/image/menu_dau.png" class="hero-cup-img" alt="Fruit Tea"></div>
+          <div class="col-7">
+            <div class="hero-content">
+              <h2 class="hero-title">FRUIT TEA</h2>
+              <p class="hero-desc">Vị trà thanh khiết kết hợp trái cây tươi, cho vị chua ngọt hài hòa và hương thơm tự nhiên.</p>
+              <a href="#fruit-tea" class="btn-explore">KHÁM PHÁ THÊM</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row g-0">
+      <div class="col-md-6 menu-hero-block bg-nen-1">
+        <div class="row align-items-center w-100 px-4">
+          <div class="col-7">
+            <div class="hero-content">
+              <h2 class="hero-title">ICED TEA</h2>
+              <p class="hero-desc">Pha chế chuẩn xác giữ trọn vị lá trà, mang lại cảm giác nhẹ nhàng, sảng khoái suốt ngày dài.</p>
+              <a href="#iced-tea" class="btn-explore">KHÁM PHÁ THÊM</a>
+            </div>
+          </div>
+          <div class="col-5 text-center"><img src="/image/menu_ice.png" class="hero-cup-img" alt="Iced Tea"></div>
+        </div>
+      </div>
+      <div class="col-md-6 menu-hero-block bg-nen-2">
+        <div class="row align-items-center w-100 px-4">
+          <div class="col-5 text-center"><img src="/image/menu_machiato.png" class="hero-cup-img" alt="Macchiato Tea"></div>
+          <div class="col-7">
+            <div class="hero-content">
+              <h2 class="hero-title">MACCHIATO TEA</h2>
+              <p class="hero-desc">Vị trà nâng hạng cùng lớp Macchiato mịn màng, béo nhẹ. Sự tương phản giữa trà đậm và kem sữa ngọt ngào tạo dư vị khó quên.</p>
+              <a href="#macchiato" class="btn-explore">KHÁM PHÁ THÊM</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL THÔNG TIN SẢN PHẨM & TÙY CHỌN THÔNG MINH -->
+  <div class="product-modal-overlay" id="productModal" onclick="checkCloseModal(event)">
+    <div class="product-modal-container" onclick="event.stopPropagation()">
+      <div class="modal-top-bar">
+        <h5>Thông tin sản phẩm</h5>
+        <button class="modal-close-x" onclick="closeProductModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      
+      <div class="modal-body-content">
+        <div class="modal-img-wrapper">
+          <img src="" id="modalImg" alt="Product">
+        </div>
+        <div class="modal-info-wrapper">
+          <div class="modal-product-name" id="modalTitle">TÊN SẢN PHẨM</div>
+          <div class="text-success mb-2"><i class="fa-solid fa-leaf"></i></div>
+          <div class="modal-price-tag" id="modalBasePrice">0 đ</div>
+          <div class="modal-desc-text" id="modalDesc">Mô tả sản phẩm...</div>
+        </div>
+      </div>
+
+      <!-- KHUNG TÙY CHỌN ĐỘ NGỌT, ĐÁ, TOPPING (CHỈ HIỆN VỚI THỨC UỐNG) -->
+      <div class="modal-options-section" id="drinkOptionsSection">
+        <h6 class="fw-bold text-uppercase mb-2 text-secondary" style="font-size: 12px;">Độ Ngọt & Mức Đá</h6>
+        <div class="row">
+          <div class="col-6">
+            <select id="modalSweetness" class="form-select form-select-sm mb-2">
+              <option value="Ngọt bình thường">Ngọt bình thường</option>
+              <option value="Ngọt 70%">Ngọt 70%</option>
+              <option value="Ngọt 50%">Ngọt 50%</option>
+              <option value="Ngọt 30%">Ngọt 30%</option>
+            </select>
+          </div>
+          <div class="col-6">
+            <select id="modalIce" class="form-select form-select-sm mb-2">
+              <option value="Đá 100%">Đá 100%</option>
+              <option value="Đá 70%">Đá 70%</option>
+              <option value="Đá 50%">Đá 50%</option>
+              <option value="Đá 0%">Đá 0% (Không đá)</option>
+            </select>
+          </div>
+        </div>
+        
+        <h6 class="fw-bold text-uppercase mt-3 mb-2 text-secondary" style="font-size: 12px;">Topping Đi Kèm</h6>
+        <div id="modalToppingContainer" style="max-height: 120px; overflow-y: auto;"></div>
+      </div>
+
+      <!-- Ô GHI CHÚ / YÊU CẦU ĐẶC BIỆT -->
+      <div class="px-4 pb-2 pt-2">
+        <h6 class="fw-bold text-uppercase mb-2 text-secondary" style="font-size: 12px;">Yêu cầu đặc biệt</h6>
+        <textarea id="modalSpecialReq" class="form-control form-control-sm" rows="2" placeholder="Ví dụ: Ít đá, nhiều trân châu..."></textarea>
+      </div>
+
+      <!-- FOOTER THÊM VÀO GIỎ -->
+      <div class="modal-footer-action">
+        <div class="d-flex align-items-center border rounded overflow-hidden">
+          <button class="btn btn-light px-3 py-1" onclick="updateModalQty(-1)">-</button>
+          <input type="text" id="modalQtyInput" class="text-center border-0" style="width: 40px; font-weight: 600;" value="1" readonly>
+          <button class="btn btn-light px-3 py-1" onclick="updateModalQty(1)">+</button>
+        </div>
+        <button class="btn-add-to-cart-modal" id="modalAddToCartBtn" onclick="confirmAddToCart()">Thêm sản phẩm - 0 đ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DRAWER GIỎ HÀNG -->
+  <div class="cart-drawer-overlay" id="cartDrawer" onclick="checkCloseCart(event)">
+    <div class="cart-drawer-container" onclick="event.stopPropagation()">
+      <div class="cart-drawer-header">
+        <h5 class="fw-bold mb-0 text-success"><i class="fa-solid fa-bag-shopping me-2"></i>Giỏ đồ ăn</h5>
+        <button class="btn-close" onclick="toggleCartDrawer(false)"></button>
+      </div>
+      <div class="cart-drawer-body" id="cartDrawerBody"></div>
+      <div class="cart-drawer-footer">
+        <div class="d-flex justify-content-between mb-3">
+          <span class="fw-bold">Tổng cộng</span>
+          <span class="fw-bold fs-5 text-success" id="cartDrawerTotal">0 đ</span>
+        </div>
+        <a href="/thanh-toan" class="btn-checkout-main" onclick="goToCheckout(event)">Xem lại đơn hàng</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- CÁC SECTION DANH MỤC SẢN PHẨM RENDER TỪ DATABASE -->
+  <div id="menu-sections-container"></div>
+
+  <!-- NẠP FOOTER CHUNG -->
+  <div id="footer-include"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    fetch('/header.html').then(r => r.text()).then(html => {
+      document.getElementById('header-include').innerHTML = html;
+      setTimeout(initHeaderUser, 100);
+    });
+    fetch('/footer.html').then(r => r.text()).then(html => { document.getElementById('footer-include').innerHTML = html; });
+
+    function initHeaderUser() {
+      const loggedUser = localStorage.getItem('currentUser');
+      const authArea = document.getElementById('authArea');
+      if (loggedUser && authArea) {
+        authArea.innerHTML = `
+          <div class="user-dropdown-wrapper" style="position:relative; display:flex; align-items:center; cursor:pointer;">
+            <img src="/image/icon_toi.png" alt="Tôi" style="width:32px; height:32px; border-radius:50%; object-fit:cover; border:1.5px solid #fff;" onerror="this.src='/image/logo1.png'">
+            <span style="color:#fff; font-size:13px; font-weight:700; margin-left:8px;">${loggedUser}</span>
+            <div class="user-dropdown-content" style="display:none; position:absolute; right:0; top:60px; background:#fff; min-width:180px; box-shadow:0 8px 24px rgba(0,0,0,0.18); border-radius:8px; overflow:hidden; z-index:99999;">
+              <a href="/tai-khoan" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Tài Khoản Của Tôi</a>
+              <a href="/don-mua" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Đơn Mua</a>
+              <a href="#" onclick="logoutUser(event)" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Đăng Xuất</a>
+            </div>
+          </div>
+        `;
+        const wrap = authArea.querySelector('.user-dropdown-wrapper');
+        const cont = authArea.querySelector('.user-dropdown-content');
+        wrap.addEventListener('mouseenter', () => cont.style.display = 'block');
+        wrap.addEventListener('mouseleave', () => cont.style.display = 'none');
+      }
+      updateHeaderCartButton();
+    }
+
+    function logoutUser(e) {
+      e.preventDefault();
+      localStorage.removeItem('currentUser');
+      window.location.href = '/';
+    }
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const resTop = await fetch('/api/toppings');
+        const allToppingsData = await resTop.json();
+
+        let topHtml = '';
+        allToppingsData.forEach(t => {
+          topHtml += `
+            <label class="modal-option-item">
+              <div><input type="checkbox" name="topping" value="${t.name}" data-price="${t.price}"> ${t.name}</div>
+              <span class="fw-bold small">${parseInt(t.price).toLocaleString('vi-VN')} đ</span>
+            </label>`;
+        });
+        document.getElementById('modalToppingContainer').innerHTML = topHtml;
+
+        await loadMenuProducts();
+      } catch (e) { console.error(e); }
+    });
+
+    async function loadMenuProducts() {
+      try {
+        const res = await fetch('/api/products/all');
+        const products = await res.json();
+        let cart = JSON.parse(localStorage.getItem('cartList')) || [];
+        const container = document.getElementById('menu-sections-container');
+        if (!container || !products) return;
+
+        let categories = {};
+        products.forEach(p => {
+          let cat = p.category || 'THỰC ĐƠN KHÁC';
+          if (!categories[cat]) categories[cat] = [];
+          categories[cat].push(p);
+        });
+
+        let html = '';
+        let sidebarHtml = '';
+
+        for (let catName in categories) {
+          let catId = catName.toLowerCase().replace(/\s+/g, '-');
+          
+          sidebarHtml += `
+            <a href="#${catId}" class="nav-dot-item" data-target="${catId}">
+              <div class="dot"></div>
+              <span>${catName}</span>
+            </a>
+          `;
+
+          html += `
+            <section class="paper-section menu-section-block" id="${catId}">
+              <div class="container">
+                <h2 class="section-category-title display-6">${catName}</h2>
+                <div style="width: 80px; height: 3px; background-color: var(--main-green); margin: 0 auto 10px;"></div>
+                <p class="section-category-desc">Thức uống và nguyên liệu được tuyển chọn kỹ lưỡng dành riêng cho bạn.</p>
+                
+                <div class="row g-4">
+          `;
+
+          categories[catName].forEach(p => {
+            let qtyInCart = cart.filter(item => item.title === p.name).reduce((sum, item) => sum + item.quantity, 0);
+
+            let actionHtml = qtyInCart > 0 
+              ? `<div class="product-qty-badge" onclick="event.stopPropagation(); editProductInCart('${p.name}')" title="Chỉnh sửa sản phẩm">${qtyInCart}</div>`
+              : `<div class="btn-product-cart" onclick="event.stopPropagation(); handleProductClick('${p.name}', ${p.price}, '${p.image_url || '/image/gao-rang.png'}', '${p.description || ''}', '${p.category}')" title="Thêm vào giỏ">
+                   <i class="fa-solid fa-cart-shopping" style="font-size: 15px;"></i>
+                 </div>`;
+
+            let bestSellerBadge = p.is_bestseller ? `<span class="badge-bestseller">Best Sellers</span>` : '';
+
+            html += `
+              <div class="col-lg-3 col-md-4 col-sm-6">
+                <div class="product-card product-clickable-area" onclick="handleProductClick('${p.name}', ${p.price}, '${p.image_url || '/image/gao-rang.png'}', '${p.description || ''}', '${p.category}')">
+                  ${bestSellerBadge}
+                  <div class="menu-img-box">
+                    <img src="${p.image_url || '/image/gao-rang.png'}" class="menu-img" alt="${p.name}">
+                  </div>
+                  <div>
+                    <h5 class="menu-title">${p.name}</h5>
+                    <p class="menu-desc">${p.description || ''}</p>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+                    <span class="fw-bold text-dark" style="font-size: 15px;">${parseInt(p.price).toLocaleString('vi-VN')} đ</span>
+                    <div>${actionHtml}</div>
+                  </div>
+                </div>
+              </div>
+            `;
+          });
+
+          html += `</div></div></section>`;
+        }
+
+        container.innerHTML = html;
+        document.getElementById('sectionNavSidebar').innerHTML = sidebarHtml;
+
+        initScrollSpy();
+      } catch (e) { console.error(e); }
+    }
+
+    function initScrollSpy() {
+      const sections = document.querySelectorAll('.menu-section-block');
+      const navItems = document.querySelectorAll('.nav-dot-item');
+      const scrollTopBtn = document.getElementById('scrollTopBtn');
+
+      window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(sec => {
+          const sectionTop = sec.offsetTop;
+          if (window.scrollY >= sectionTop - 200) {
+            current = sec.getAttribute('id');
+          }
+        });
+
+        navItems.forEach(item => {
+          item.classList.remove('active');
+          if (item.getAttribute('data-target') === current) {
+            item.classList.add('active');
+          }
+        });
+
+        if (window.scrollY > 400) {
+          scrollTopBtn.classList.add('show');
+        } else {
+          scrollTopBtn.classList.remove('show');
+        }
+      });
+    }
+
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function updateHeaderCartButton() {
+      const cartBtn = document.querySelector('.cart-icon-btn');
+      if (!cartBtn) return;
+      const cart = JSON.parse(localStorage.getItem('cartList')) || [];
+      const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+      const badge = cartBtn.querySelector('.cart-badge-count');
+      if (badge) badge.innerText = totalCount;
+
+      cartBtn.onclick = function() {
+        const loggedUser = localStorage.getItem('currentUser');
+        if (!loggedUser) alert('Vui lòng đăng nhập để xem giỏ hàng!');
+        else openCartDrawer();
+      };
+    }
+
+    function handleProductClick(title, price, img, desc, category) {
+      const loggedUser = localStorage.getItem('currentUser');
+      if (!loggedUser) {
+        alert('Vui lòng đăng nhập để đặt đơn.');
+        window.location.href = '/login';
+      } else {
+        openProductModal(title, price, img, desc, category, null);
+      }
+    }
+
+    function editProductInCart(title) {
+      let cart = JSON.parse(localStorage.getItem('cartList')) || [];
+      let existingItemIndex = cart.findIndex(item => item.title === title);
+      if (existingItemIndex !== -1) {
+        let item = cart[existingItemIndex];
+        openProductModal(item.title, item.price, item.img, '', item.category, item, existingItemIndex);
+      }
+    }
+
+    let currentProduct = { title: '', basePrice: 0, img: '', category: '', editingIndex: null };
+    let modalQuantity = 1;
+
+    function openProductModal(title, price, img, desc, category, existingItem = null, index = null) {
+      currentProduct = { title, basePrice: price, img, category, editingIndex: index };
+      
+      document.getElementById('modalTitle').innerText = title;
+      document.getElementById('modalBasePrice').innerText = price.toLocaleString('vi-VN') + ' đ';
+      document.getElementById('modalImg').src = img;
+      document.getElementById('modalDesc').innerText = desc || 'Hương vị thơm ngon, chất lượng tuyệt hảo từ Bông Trà.';
+      document.getElementById('modalSpecialReq').value = '';
+
+      const drinkOptionsSection = document.getElementById('drinkOptionsSection');
+      // Chỉ các danh mục thức uống mới hiện bảng chọn độ ngọt, mức đá và topping đi kèm
+      const isDrink = ['Milk Tea', 'Fruit Tea', 'Iced Tea', 'Macchiato'].includes(category);
+      
+      if (isDrink) {
+        drinkOptionsSection.style.display = 'block';
+        document.getElementById('modalSweetness').value = 'Ngọt bình thường';
+        document.getElementById('modalIce').value = 'Đá 100%';
+        document.querySelectorAll('input[name="topping"]').forEach(cb => cb.checked = false);
+      } else {
+        drinkOptionsSection.style.display = 'none'; // Ẩn hoàn toàn với Bánh Mì, Bánh Ngọt, Topping
+      }
+
+      if (existingItem) {
+        modalQuantity = existingItem.quantity;
+        document.getElementById('modalQtyInput').value = modalQuantity;
+        document.getElementById('modalSpecialReq').value = existingItem.specialReq || '';
+        if (isDrink) {
+          if (existingItem.sweetness) document.getElementById('modalSweetness').value = existingItem.sweetness;
+          if (existingItem.ice) document.getElementById('modalIce').value = existingItem.ice;
+          if (existingItem.toppings && existingItem.toppings.length > 0) {
+            document.querySelectorAll('input[name="topping"]').forEach(cb => {
+              if (existingItem.toppings.some(t => t.name === cb.value)) cb.checked = true;
+            });
+          }
+        }
+      } else {
+        modalQuantity = 1;
+        document.getElementById('modalQtyInput').value = 1;
+      }
+
+      document.getElementById('productModal').classList.add('active');
+      calculateModalTotal();
+    }
+
+    function closeProductModal() { document.getElementById('productModal').classList.remove('active'); }
+    function checkCloseModal(e) { if (e.target.id === 'productModal') closeProductModal(); }
+    function checkCloseCart(e) { if (e.target.id === 'cartDrawer') toggleCartDrawer(false); }
+
+    function updateModalQty(change) {
+      modalQuantity += change;
+      if (modalQuantity < 1) modalQuantity = 1;
+      document.getElementById('modalQtyInput').value = modalQuantity;
+      calculateModalTotal();
+    }
+
+    function calculateModalTotal() {
+      let total = currentProduct.basePrice;
+      const isDrink = ['Milk Tea', 'Fruit Tea', 'Iced Tea', 'Macchiato'].includes(currentProduct.category);
+      
+      if (isDrink) {
+        document.querySelectorAll('input[name="topping"]:checked').forEach(cb => {
+          total += parseInt(cb.getAttribute('data-price') || 0);
+        });
+      }
+      total = total * modalQuantity;
+      document.getElementById('modalAddToCartBtn').innerText = `Thêm sản phẩm - ${total.toLocaleString('vi-VN')} đ`;
+    }
+
+    document.addEventListener('change', (e) => {
+      if(e.target.name === 'topping' || e.target.id === 'modalSweetness' || e.target.id === 'modalIce') {
+        calculateModalTotal();
+      }
+    });
+
+    function confirmAddToCart() {
+      const isDrink = ['Milk Tea', 'Fruit Tea', 'Iced Tea', 'Macchiato'].includes(currentProduct.category);
+      const selectedSweetness = isDrink ? document.getElementById('modalSweetness').value : null;
+      const selectedIce = isDrink ? document.getElementById('modalIce').value : null;
+      let selectedToppings = [];
+      
+      if (isDrink) {
+        document.querySelectorAll('input[name="topping"]:checked').forEach(cb => {
+          selectedToppings.push({ name: cb.value, price: parseInt(cb.getAttribute('data-price')) });
+        });
+      }
+      const specialReq = document.getElementById('modalSpecialReq').value;
+
+      let cart = JSON.parse(localStorage.getItem('cartList')) || [];
+
+      const newItemData = {
+        title: currentProduct.title,
+        price: currentProduct.basePrice,
+        img: currentProduct.img,
+        quantity: modalQuantity,
+        category: currentProduct.category,
+        sweetness: selectedSweetness,
+        ice: selectedIce,
+        toppings: selectedToppings,
+        specialReq: specialReq
+      };
+
+      if (currentProduct.editingIndex !== null && currentProduct.editingIndex >= 0) {
+        cart[currentProduct.editingIndex] = newItemData;
+      } else {
+        cart.push(newItemData);
+      }
+
+      localStorage.setItem('cartList', JSON.stringify(cart));
+
+      closeProductModal();
+      updateHeaderCartButton();
+      loadMenuProducts();
+      openCartDrawer();
+    }
+
+    function openCartDrawer() {
+      renderCartDrawerItems();
+      document.getElementById('cartDrawer').classList.add('active');
+    }
+    function toggleCartDrawer(isOpen) {
+      document.getElementById('cartDrawer').classList.toggle('active', isOpen);
+    }
+
+    function renderCartDrawerItems() {
+      const body = document.getElementById('cartDrawerBody');
+      const totalSpan = document.getElementById('cartDrawerTotal');
+      let cart = JSON.parse(localStorage.getItem('cartList')) || [];
+
+      if (cart.length === 0) {
+        body.innerHTML = `<p class="text-center text-muted my-5">Giỏ hàng của bạn đang trống.</p>`;
+        totalSpan.innerText = '0 đ';
+        return;
+      }
+
+      let html = `<p class="fw-bold text-success mb-3">Trà Sữa Bông Trà - Lũy Bán Bích</p>`;
+      let grandTotal = 0;
+
+      cart.forEach((item, index) => {
+        let itemPrice = item.price;
+        let toppingsText = '';
+        if (item.toppings) {
+          item.toppings.forEach(t => {
+            itemPrice += t.price;
+            toppingsText += `<br>${t.name}`;
+          });
+        }
+        let itemTotal = itemPrice * item.quantity;
+        grandTotal += itemTotal;
+
+        html += `
+          <div class="cart-item-row">
+            <img src="${item.img}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;">
+            <div style="flex-grow: 1; padding: 0 10px;">
+              <h6 class="fw-bold mb-1" style="font-size: 13px;">${item.title}</h6>
+              <small class="text-muted" style="font-size: 11px;">${item.sweetness ? item.sweetness + ', ' + item.ice : ''} ${toppingsText}</small>
+              <div class="d-flex align-items-center gap-2 mt-2">
+                <button class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="changeCartQty(${index}, -1)">-</button>
+                <span style="font-size: 13px; font-weight: 600;">${item.quantity}</span>
+                <button class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="changeCartQty(${index}, 1)">+</button>
+              </div>
+            </div>
+            <div class="text-end">
+              <span class="fw-bold text-dark" style="font-size: 13.5px;">${itemTotal.toLocaleString('vi-VN')} đ</span>
+              <br><a href="#" onclick="removeCartItem(${index}); return false;" class="text-danger" style="font-size: 11px;">Xóa</a>
+            </div>
+          </div>`;
+      });
+
+      body.innerHTML = html;
+      totalSpan.innerText = grandTotal.toLocaleString('vi-VN') + ' đ';
+    }
+
+    function changeCartQty(index, change) {
+      let cart = JSON.parse(localStorage.getItem('cartList')) || [];
+      cart[index].quantity += change;
+      if (cart[index].quantity <= 0) cart.splice(index, 1);
+      localStorage.setItem('cartList', JSON.stringify(cart));
+      renderCartDrawerItems();
+      updateHeaderCartButton();
+      loadMenuProducts();
+    }
+
+    function removeCartItem(index) {
+      let cart = JSON.parse(localStorage.getItem('cartList')) || [];
+      cart.splice(index, 1);
+      localStorage.setItem('cartList', JSON.stringify(cart));
+      renderCartDrawerItems();
+      updateHeaderCartButton();
+      loadMenuProducts();
+    }
+
+    function goToCheckout(e) {
+      e.preventDefault();
+      window.location.href = '/thanh-toan';
+    }
+  </script>
+</body>
+</html>

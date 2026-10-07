@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tin Tức - Ưu Đãi Bông Trà</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root { --main-green: #006030; }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #fbf9f5 url('https://www.transparenttextures.com/patterns/paper.png');
+      color: #333;
+      overflow-x: hidden;
+      padding-top: 60px;
+    }
+
+    .paper-section {
+      background: #fbf9f5 url('https://www.transparenttextures.com/patterns/paper.png');
+      padding: 50px 0;
+    }
+
+    .section-title {
+      color: var(--main-green);
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    .title-line {
+      width: 80px;
+      height: 3px;
+      background-color: var(--main-green);
+      margin: 0 auto 25px;
+    }
+
+    /* Container cuộn ngang */
+    .news-scroll-wrapper {
+      display: flex;
+      gap: 16px;
+      overflow-x: auto;
+      padding: 10px 5px 20px 5px;
+      scroll-behavior: smooth;
+    }
+
+    .news-scroll-wrapper::-webkit-scrollbar { height: 6px; }
+    .news-scroll-wrapper::-webkit-scrollbar-thumb { background: var(--main-green); border-radius: 10px; }
+
+    .promo-card-vertical {
+      flex: 0 0 calc(25% - 12px);
+      min-width: 260px;
+      background: #ffffff;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+      border: 1px solid #eaeaea;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+      cursor: pointer;
+    }
+
+    .promo-card-vertical:hover, .news-card-square:hover, .news-card-horizontal:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 30px rgba(0, 96, 48, 0.18);
+      border-color: var(--main-green);
+    }
+
+    .promo-card-img { width: 100%; height: 320px; object-fit: cover; }
+    .badge-category { background-color: var(--main-green); color: white; font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 12px; display: inline-block; text-transform: uppercase; }
+
+    .news-card-square, .news-card-horizontal {
+      background: #ffffff;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+      border: 1px solid #eaeaea;
+      transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+      cursor: pointer;
+      height: 100%;
+    }
+
+    .news-card-img { width: 100%; height: 260px; object-fit: cover; }
+    .news-horizontal-img { width: 100%; height: 140px; object-fit: cover; }
+  </style>
+</head>
+<body>
+
+  <!-- NẠP HEADER CHUNG -->
+  <div id="header-include"></div>
+
+  <!-- 1. ƯU ĐÃI MỚI NHẤT -->
+  <section class="paper-section">
+    <div class="container text-center">
+      <h2 class="display-6 section-title">ƯU ĐÃI MỚI NHẤT</h2>
+      <div class="title-line"></div>
+      <div class="news-scroll-wrapper" id="promo-scroll-container"></div>
+    </div>
+  </section>
+
+  <!-- 2. TIN TỨC MỚI NHẤT -->
+  <section class="paper-section pt-0">
+    <div class="container text-center">
+      <h2 class="display-6 section-title">TIN TỨC MỚI NHẤT</h2>
+      <div class="title-line"></div>
+      <div class="row g-4 text-start" id="latest-news-list"></div>
+    </div>
+  </section>
+
+  <!-- 3. TIN TỨC NHÀ BÔNG -->
+  <section class="paper-section pt-0">
+    <div class="container text-center">
+      <h2 class="display-6 section-title">TIN TỨC NHÀ BÔNG</h2>
+      <div class="title-line"></div>
+      <div class="row g-4 text-start" id="home-news-list"></div>
+    </div>
+  </section>
+
+  <!-- NẠP FOOTER CHUNG -->
+  <div id="footer-include"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+  function initHeaderUser() {
+    const loggedUser = localStorage.getItem('currentUser');
+    const authArea = document.getElementById('authArea');
+    if (loggedUser && authArea) {
+      authArea.innerHTML = `
+        <div class="user-dropdown-wrapper" style="position:relative; display:flex; align-items:center; cursor:pointer; height:60px;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <img src="/image/icon_toi.png" alt="Tôi" style="width:30px; height:30px; border-radius:50%; object-fit:cover; border:1.5px solid #fff;" onerror="this.src='/image/logo1.png'">
+            <span style="color:#fff; font-size:12px; font-weight:800; text-transform:uppercase;">${loggedUser}</span>
+          </div>
+          <div class="user-dropdown-content" style="display:none; position:absolute; right:0; top:60px; background:#fff; min-width:180px; box-shadow:0 8px 24px rgba(0,0,0,0.18); border-radius:8px; overflow:hidden; z-index:99999; border:1px solid #eaeaea;">
+            <a href="/tai-khoan" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Tài Khoản Của Tôi</a>
+            <a href="/don-mua" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Đơn Mua</a>
+            <a href="#" onclick="localStorage.removeItem('currentUser'); window.location.href='/'; return false;" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Đăng Xuất</a>
+          </div>
+        </div>
+      `;
+      const wrap = authArea.querySelector('.user-dropdown-wrapper');
+      const cont = authArea.querySelector('.user-dropdown-content');
+      if(wrap && cont) {
+        wrap.addEventListener('mouseenter', () => cont.style.display = 'block');
+        wrap.addEventListener('mouseleave', () => cont.style.display = 'none');
+      }
+    }
+    const cartBtn = document.querySelector('.cart-icon-btn');
+    if (cartBtn) {
+      const cart = JSON.parse(localStorage.getItem('cartList')) || [];
+      const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+      const badge = cartBtn.querySelector('.cart-badge-count');
+      if (badge) badge.innerText = totalCount;
+      cartBtn.onclick = function() {
+        if (!loggedUser) {
+          alert('Vui lòng đăng nhập để xem giỏ hàng!');
+          window.location.href = '/login';
+        } else {
+          window.location.href = '/menu';
+        }
+      };
+    }
+  }
+
+  fetch('/header.html').then(r => r.text()).then(html => { 
+    document.getElementById('header-include').innerHTML = html;
+    initHeaderUser();
+  });
+  fetch('/footer.html').then(r => r.text()).then(html => { document.getElementById('footer-include').innerHTML = html; });
+
+  document.addEventListener("DOMContentLoaded", () => {
+    fetch('/api/news')
+      .then(r => r.json())
+      .then(news => {
+        if (!news || news.length === 0) return;
+        const promoContainer = document.getElementById('promo-scroll-container');
+        if(promoContainer) {
+          promoContainer.innerHTML = news.map(p => `
+            <div class="promo-card-vertical" onclick="window.location.href='/tin-tuc-chi-tiet.html?id=${p.id}'">
+              <div style="overflow:hidden;"><img src="${p.image_url}" class="promo-card-img" alt="${p.title}"></div>
+              <div class="p-3 text-start">
+                <span class="badge-category mb-2">${p.category || 'BÔNG TRÀ ƯU ĐÃI'}</span>
+                <h6 class="fw-bold text-dark mt-1" style="font-size: 13px; line-height: 1.4; height: 38px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${p.title}</h6>
+              </div>
+              <div class="p-3 pt-0 d-flex justify-content-between align-items-center text-muted small border-top" style="font-size: 11px;">
+                <span>📅 ${p.created_date || ''}</span><span class="text-success fw-bold">Xem chi tiết</span>
+              </div>
+            </div>
+          `).join('');
+        }
+        const latestNews = document.getElementById('latest-news-list');
+        if(latestNews) {
+          latestNews.innerHTML = news.slice(0, 3).map(n => `
+            <div class="col-md-4">
+              <div class="news-card-square" onclick="window.location.href='/tin-tuc-chi-tiet.html?id=${n.id}'">
+                <div style="overflow:hidden;"><img src="${n.image_url}" class="news-card-img" alt="${n.title}"></div>
+                <div class="p-3 d-flex flex-column justify-content-between">
+                  <div>
+                    <span class="badge-category mb-2">${n.category || 'TIN TỨC'}</span>
+                    <h6 class="fw-bold text-dark mt-1" style="font-size: 14px; line-height: 1.4; height: 40px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${n.title}</h6>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center mt-3 text-muted small border-top pt-2" style="font-size: 11px;">
+                    <span>📅 ${n.created_date || ''}</span><span class="text-success fw-bold">Xem chi tiết</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `).join('');
+        }
+        const homeNews = document.getElementById('home-news-list');
+        if(homeNews) {
+          homeNews.innerHTML = news.map(n => `
+            <div class="col-md-6">
+              <div class="news-card-horizontal p-2" onclick="window.location.href='/tin-tuc-chi-tiet.html?id=${n.id}'">
+                <div class="row g-2 align-items-center">
+                  <div class="col-4"><img src="${n.image_url}" class="news-horizontal-img rounded" alt="${n.title}"></div>
+                  <div class="col-8 p-2 d-flex flex-column justify-content-between">
+                    <div>
+                      <span class="badge-category mb-1">${n.category || 'TIN TỨC'}</span>
+                      <h6 class="fw-bold text-dark mb-1" style="font-size: 13px; line-height: 1.3;">${n.title}</h6>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center text-muted" style="font-size: 11px;">
+                      <span>📅 ${n.created_date || ''}</span><span class="text-success fw-bold">Đọc bài viết</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `).join('');
+        }
+      });
+  });
+</script>
+</body>
+</html>

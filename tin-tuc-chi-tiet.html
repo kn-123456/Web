@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chi Tiết Bài Viết - Bông Trà</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root { --main-green: #006030; }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #fbf9f5 url('https://www.transparenttextures.com/patterns/paper.png');
+      color: #333;
+      overflow-x: hidden;
+      padding-top: 60px;
+    }
+
+    .paper-section {
+      background: #fbf9f5 url('https://www.transparenttextures.com/patterns/paper.png');
+      padding: 30px 0 60px;
+    }
+
+    .custom-breadcrumb {
+      font-size: 11px;
+      font-weight: 700;
+      color: #006030;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 25px;
+    }
+
+    .custom-breadcrumb a {
+      color: #555;
+      text-decoration: none;
+    }
+
+    .custom-breadcrumb a:hover {
+      color: var(--main-green);
+    }
+
+    .article-container-card {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 35px;
+      box-shadow: 0 6px 25px rgba(0, 0, 0, 0.05);
+      border: 1px solid #eaeaea;
+    }
+
+    .article-poster-img {
+      width: 100%;
+      border-radius: 12px;
+      object-fit: cover;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    }
+
+    .article-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: #1a1a1a;
+      line-height: 1.35;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .article-meta {
+      font-size: 12px;
+      color: #777777;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #eeeeee;
+      margin-bottom: 20px;
+    }
+
+    .article-body-content {
+      font-size: 13.5px;
+      line-height: 1.8;
+      color: #444444;
+      white-space: pre-line;
+    }
+
+    .hashtag-box {
+      margin-top: 25px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .hashtag-item {
+      background-color: #f0f4f1;
+      color: #555555;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 6px;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NẠP HEADER CHUNG -->
+  <div id="header-include"></div>
+
+  <section class="paper-section">
+    <div class="container">
+      
+      <div class="custom-breadcrumb">
+        <a href="/">TRANG CHỦ</a> &nbsp;·&nbsp; 
+        <a href="/tin-tuc.html">TIN TỨC - ƯU ĐÃI</a> &nbsp;·&nbsp; 
+        <span id="breadcrumb-title" class="text-success">ĐANG TẢI...</span>
+      </div>
+
+      <div class="article-container-card">
+        <div class="row g-4 align-items-start" id="article-detail-content">
+          <div class="text-center py-5 w-100">
+            <div class="spinner-border text-success" role="status"></div>
+            <p class="mt-2 text-muted">Đang tải bài viết...</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- NẠP FOOTER CHUNG -->
+  <div id="footer-include"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+ <script>
+  function initHeaderUser() {
+    const loggedUser = localStorage.getItem('currentUser');
+    const authArea = document.getElementById('authArea');
+    if (loggedUser && authArea) {
+      authArea.innerHTML = `
+        <div class="user-dropdown-wrapper" style="position:relative; display:flex; align-items:center; cursor:pointer; height:60px;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <img src="/image/icon_toi.png" alt="Tôi" style="width:30px; height:30px; border-radius:50%; object-fit:cover; border:1.5px solid #fff;" onerror="this.src='/image/logo1.png'">
+            <span style="color:#fff; font-size:12px; font-weight:800; text-transform:uppercase;">${loggedUser}</span>
+          </div>
+          <div class="user-dropdown-content" style="display:none; position:absolute; right:0; top:60px; background:#fff; min-width:180px; box-shadow:0 8px 24px rgba(0,0,0,0.18); border-radius:8px; overflow:hidden; z-index:99999; border:1px solid #eaeaea;">
+            <a href="/tai-khoan" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Tài Khoản Của Tôi</a>
+            <a href="/don-mua" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Đơn Mua</a>
+            <a href="#" onclick="localStorage.removeItem('currentUser'); window.location.href='/'; return false;" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Đăng Xuất</a>
+          </div>
+        </div>
+      `;
+      const wrap = authArea.querySelector('.user-dropdown-wrapper');
+      const cont = authArea.querySelector('.user-dropdown-content');
+      if(wrap && cont) {
+        wrap.addEventListener('mouseenter', () => cont.style.display = 'block');
+        wrap.addEventListener('mouseleave', () => cont.style.display = 'none');
+      }
+    }
+    const cartBtn = document.querySelector('.cart-icon-btn');
+    if (cartBtn) {
+      const cart = JSON.parse(localStorage.getItem('cartList')) || [];
+      const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+      const badge = cartBtn.querySelector('.cart-badge-count');
+      if (badge) badge.innerText = totalCount;
+      cartBtn.onclick = function() {
+        if (!loggedUser) {
+          alert('Vui lòng đăng nhập để xem giỏ hàng!');
+          window.location.href = '/login';
+        } else {
+          window.location.href = '/menu';
+        }
+      };
+    }
+  }
+
+  fetch('/header.html').then(r => r.text()).then(html => { 
+    document.getElementById('header-include').innerHTML = html;
+    initHeaderUser();
+  });
+  fetch('/footer.html').then(r => r.text()).then(html => { document.getElementById('footer-include').innerHTML = html; });
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const articleId = urlParams.get('id');
+
+    if (!articleId) {
+      document.getElementById('article-detail-content').innerHTML = `
+        <div class="text-center py-5">
+          <h5 class="text-danger fw-bold">Không tìm thấy bài viết!</h5>
+          <a href="/tin-tuc.html" class="btn btn-sm btn-success mt-2">Quay lại danh sách Tin tức</a>
+        </div>
+      `;
+      return;
+    }
+
+    fetch(`/api/news`)
+      .then(res => res.json())
+      .then(newsList => {
+        const article = newsList.find(n => n.id == articleId);
+        if (!article) {
+          document.getElementById('article-detail-content').innerHTML = `
+            <div class="text-center py-5">
+              <h5 class="text-danger fw-bold">Không tìm thấy bài viết!</h5>
+              <a href="/tin-tuc.html" class="btn btn-sm btn-success mt-2">Quay lại danh sách Tin tức</a>
+            </div>
+          `;
+          return;
+        }
+
+        document.title = `${article.title} - Bông Trà`;
+        document.getElementById('breadcrumb-title').innerText = article.title;
+
+        let hashtagsHTML = '';
+        if (article.hashtag) {
+          hashtagsHTML = article.hashtag.split(',').map(tag => `<span class="hashtag-item">#${tag.trim()}</span>`).join('');
+        }
+
+        document.getElementById('article-detail-content').innerHTML = `
+          <div class="col-lg-5">
+            <img src="${article.image_url}" class="article-poster-img" alt="${article.title}">
+          </div>
+          <div class="col-lg-7">
+            <h1 class="article-title">${article.title}</h1>
+            <div class="article-meta">
+              <span><i class="fa-regular fa-user me-1 text-success"></i> ${article.author || 'Bông Trà'}</span>
+              <span><i class="fa-regular fa-clock me-1 text-success"></i> ${article.created_date || ''}</span>
+            </div>
+            <div class="article-body-content">${article.content || ''}</div>
+            <div class="hashtag-box">${hashtagsHTML}</div>
+          </div>
+        `;
+      });
+  });
+</script>
+</body>
+</html>

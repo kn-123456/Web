@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng Ký Tài Khoản - Bông Trà</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root { --main-green: #006030; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: url('/image/nen.jpg') center/cover no-repeat fixed;
+      min-height: 100vh; display: flex; flex-direction: column; justify-content: space-between;
+      padding-top: 60px;
+    }
+
+    .auth-card {
+      background: rgba(255, 255, 255, 0.96);
+      border-radius: 20px; padding: 35px 40px; width: 100%; max-width: 460px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.15); backdrop-filter: blur(5px);
+    }
+    .btn-auth { background-color: var(--main-green); color: white; font-weight: 700; border-radius: 10px; padding: 12px; border: none; width: 100%; transition: background 0.3s; }
+    .btn-auth:hover { background-color: #004d25; }
+
+    .error-feedback-text { color: #dc3545; font-size: 12px; margin-top: 4px; display: none; font-weight: 600; }
+
+    .custom-welcome-toast {
+      position: fixed; top: 85px; right: 25px; background: #ffffff; border-radius: 14px;
+      padding: 18px 24px; box-shadow: 0 12px 35px rgba(0,0,0,0.18); display: flex;
+      align-items: center; gap: 16px; z-index: 999999; transform: translateX(130%);
+      transition: transform 0.45s cubic-bezier(0.68, -0.55, 0.265, 1.55); border: 1px solid #eaeaea;
+    }
+    .custom-welcome-toast.show { transform: translateX(0); }
+    .toast-welcome-icon { width: 40px; height: 40px; background: #e8f5ed; color: var(--main-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .toast-text-title { font-size: 14.5px; font-weight: 700; color: #222222; margin-bottom: 2px; }
+    .toast-text-sub { font-size: 12.5px; color: #666666; margin-bottom: 0; }
+  </style>
+</head>
+<body>
+
+  <!-- NẠP HEADER CHUNG TỰ ĐỘNG -->
+  <div id="header-include"></div>
+
+  <div class="custom-welcome-toast" id="welcomeToast">
+    <div class="toast-welcome-icon"><i class="fa-solid fa-user-check"></i></div>
+    <div>
+      <div class="toast-text-title" id="toastNameTitle">Chào mừng bạn!</div>
+      <p class="toast-text-sub">Đăng ký thành công tài khoản thành viên.</p>
+    </div>
+  </div>
+
+  <div class="container py-4 d-flex justify-content-center align-items-center">
+    <div class="auth-card">
+      <div class="text-center mb-3">
+        <h4 class="text-success fw-bold">TẠO TÀI KHOẢN</h4>
+        <p class="text-muted small mb-0">Đăng ký thành viên để nhận nhiều ưu đãi từ Bông Trà</p>
+      </div>
+      <form id="registerForm">
+        <div class="mb-2">
+          <label class="form-label small fw-bold">Họ và tên</label>
+          <input type="text" id="fullname" class="form-control form-control-sm" placeholder="Nhập họ và tên của bạn" required>
+        </div>
+        <div class="mb-2">
+          <label class="form-label small fw-bold">Số điện thoại</label>
+          <input type="tel" id="phone" class="form-control form-control-sm" placeholder="Nhập số điện thoại (10-11 chữ số)" required>
+          <div class="error-feedback-text" id="phoneErrorMsg">Số điện thoại không hợp lệ (phải gồm 10-11 chữ số và không chứa ký tự chữ).</div>
+        </div>
+        <div class="mb-2">
+          <label class="form-label small fw-bold">Tên đăng nhập</label>
+          <input type="text" id="username" class="form-control form-control-sm" placeholder="Nhập tên tài khoản" required>
+          <div class="error-feedback-text" id="usernameErrorMsg">Tên đăng nhập đã tồn tại, vui lòng thay đổi.</div>
+        </div>
+        <div class="mb-2">
+          <label class="form-label small fw-bold">Mật khẩu</label>
+          <input type="password" id="password" class="form-control form-control-sm" placeholder="Nhập mật khẩu" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label small fw-bold">Nhập lại mật khẩu</label>
+          <input type="password" id="confirmPassword" class="form-control form-control-sm" placeholder="Nhập lại mật khẩu" required>
+          <div class="error-feedback-text" id="passwordErrorMsg">Mật khẩu nhập lại không khớp. Vui lòng kiểm tra lại!</div>
+        </div>
+        <button type="submit" class="btn-auth mb-3">Đăng Ký</button>
+        <div class="text-center small">
+          <span class="text-muted">Đã có tài khoản?</span> <a href="/login" class="text-success fw-bold text-decoration-none">Đăng nhập ngay</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="footer-include"></div>
+
+  <!-- BOOTSTRAP JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Tự động nạp Header và kích hoạt hàm xử lý chung
+    fetch('/header.html')
+      .then(r => r.text())
+      .then(html => { 
+        document.getElementById('header-include').innerHTML = html;
+        if (typeof initHeaderUser === 'function') {
+          initHeaderUser();
+        }
+      });
+
+    fetch('/footer.html').then(r => r.text()).then(data => { document.getElementById('footer-include').innerHTML = data; });
+
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fullname = document.getElementById('fullname').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+
+      const phoneErrorMsg = document.getElementById('phoneErrorMsg');
+      const usernameErrorMsg = document.getElementById('usernameErrorMsg');
+      const passwordErrorMsg = document.getElementById('passwordErrorMsg');
+
+      let hasError = false;
+
+      const phoneRegex = /^[0-9]{10,11}$/;
+      if (!phoneRegex.test(phone)) {
+        phoneErrorMsg.style.display = 'block';
+        hasError = true;
+      } else {
+        phoneErrorMsg.style.display = 'none';
+      }
+
+      if (password !== confirmPassword) {
+        passwordErrorMsg.style.display = 'block';
+        hasError = true;
+      } else {
+        passwordErrorMsg.style.display = 'none';
+      }
+
+      if (hasError) return;
+
+      try {
+        const res = await fetch('/api/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ fullname, phone, username, password })
+        });
+        const data = await res.json();
+        
+        if (res.ok) {
+          usernameErrorMsg.style.display = 'none';
+          localStorage.setItem('currentUser', username);
+
+          document.getElementById('toastNameTitle').innerText = `Chào mừng ${fullname} (${username})!`;
+          document.getElementById('welcomeToast').classList.add('show');
+
+          setTimeout(() => {
+            window.location.href = '/';
+          }, 1500);
+        } else {
+          usernameErrorMsg.innerText = data.message || data.error || 'Tên đăng nhập đã tồn tại, vui lòng thay đổi.';
+          usernameErrorMsg.style.display = 'block';
+        }
+      } catch (err) {
+        usernameErrorMsg.innerText = 'Lỗi kết nối server!';
+        usernameErrorMsg.style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>

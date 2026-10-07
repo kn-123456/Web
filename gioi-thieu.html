@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Về Bông Trà - Bông Trà</title>
+  
+  <!-- BOOTSTRAP 5 & FONTAWESOME -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- THƯ VIỆN AOS ANIMATION -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+  <style>
+    :root { --main-green: #006030; }
+
+    /* NỀN VÂN GIẤY XUYÊN SUỐT TOÀN TRANG */
+    body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #fbf9f5 url('https://www.transparenttextures.com/patterns/paper.png');
+    color: #333;
+    overflow-x: hidden;
+    padding-top: 90px; /* ĐẢM BẢO TIÊU ĐỀ KHÔNG BỊ HEADER CHE */
+  }
+
+  .paper-section {
+    background: #fbf9f5 url('https://www.transparenttextures.com/patterns/paper.png');
+    padding: 40px 0 60px; /* CHỈNH NHAU TRÊN ĐỂ NỘI DUNG THOÁNG ĐẸP */
+  }
+
+    .section-title {
+      color: var(--main-green);
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    .section-subtext {
+      color: #666666;
+      font-size: 14px;
+      margin-bottom: 35px;
+    }
+
+    .title-line {
+      width: 80px;
+      height: 3px;
+      background-color: var(--main-green);
+      margin: 0 auto 20px;
+    }
+
+    /* 1. GIỚI THIỆU CHUNG */
+    .intro-box { max-width: 850px; margin: 0 auto; text-align: center; }
+    .intro-feature-list {
+      list-style: none; padding: 0; margin: 25px 0 0;
+      display: flex; flex-direction: column; gap: 12px; align-items: center;
+    }
+    .intro-feature-list li {
+      font-size: 14px; color: #444; font-weight: 600;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .intro-feature-list li i { color: var(--main-green); font-size: 16px; }
+
+    .about-banner-img {
+      width: 100%; max-width: 900px; border-radius: 18px;
+      box-shadow: 0 12px 35px rgba(0, 96, 48, 0.15); object-fit: cover;
+      margin: 35px auto 0; display: block; transition: transform 0.5s ease;
+    }
+
+    /* 2. SỨ MỆNH & GIÁ TRỊ CỐT LÕI */
+    .values-bg-section {
+      background: url('/image/anh_nen_1.jpg') center/cover no-repeat fixed;
+      padding: 80px 0; position: relative;
+    }
+    .values-bg-section::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(255, 255, 255, 0.75); z-index: 1;
+    }
+    .values-container { position: relative; z-index: 2; }
+
+    .value-card-box {
+      background: #ffffff; border-radius: 16px; padding: 40px 20px 25px;
+      height: 100%; position: relative; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e0e0e0; text-align: center;
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+    }
+    .value-card-box:hover {
+      transform: translateY(-10px) !important;
+      box-shadow: 0 15px 35px rgba(0, 96, 48, 0.2);
+      border-color: var(--main-green);
+    }
+
+    .value-top-icon {
+      position: absolute; top: -25px; left: 50%; transform: translateX(-50%);
+      width: 52px; height: 52px; background: #ffffff;
+      border: 2px solid #a3d9b8; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease, background 0.3s;
+    }
+    .value-top-icon img { width: 28px; height: 28px; object-fit: contain; }
+    .value-card-box:hover .value-top-icon {
+      background: #e8f5ed;
+      transform: translateX(-50%) rotate(15deg);
+    }
+
+    .value-card-title { font-size: 15px; font-weight: 800; color: var(--main-green); margin-top: 10px; margin-bottom: 10px; text-transform: uppercase; }
+    .value-card-desc { font-size: 12px; color: #555555; line-height: 1.6; margin-bottom: 0; }
+
+    /* 3. HÀNH TRÌNH PHÁT TRIỂN (CÓ ĐƯỜNG CONG NẾT ĐỨT) */
+    .curved-timeline-wrapper {
+      position: relative;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 40px 0;
+    }
+
+    .timeline-svg-path {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 1; pointer-events: none;
+    }
+
+    .timeline-node-item {
+      position: relative; z-index: 2;
+      display: flex; align-items: center;
+      margin-bottom: 90px;
+    }
+    .timeline-node-item:nth-child(even) { flex-direction: row-reverse; }
+
+    .timeline-col-text { width: 45%; padding: 0 25px; }
+    .timeline-node-item:nth-child(odd) .timeline-col-text { text-align: right; }
+    .timeline-node-item:nth-child(even) .timeline-col-text { text-align: left; }
+
+    .timeline-col-media { width: 45%; padding: 0 25px; }
+
+    .timeline-leaf-icon-circle {
+      position: absolute; left: 50%; transform: translateX(-50%);
+      width: 46px; height: 46px; background: #ffffff;
+      border: 2px dashed #006030; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 3;
+    }
+    .timeline-leaf-icon-circle img { width: 24px; height: 24px; object-fit: contain; }
+
+    .timeline-year-text { font-size: 42px; font-weight: 900; color: var(--main-green); line-height: 1; margin-bottom: 12px; }
+    .timeline-paragraph { font-size: 13px; color: #555555; line-height: 1.7; }
+    
+    .timeline-card-frame {
+      position: relative; display: inline-block; width: 100%;
+      border-radius: 16px; overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+      border: 3px solid var(--main-green);
+    }
+    .timeline-card-frame img { width: 100%; height: 230px; object-fit: cover; display: block; }
+
+    /* 4. THÀNH TỰU CỦA BÔNG TRÀ */
+    .achievement-box {
+      background: #ffffff; border-radius: 14px; padding: 30px 15px;
+      text-align: center; border: 1px solid #eaeaea;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.04); transition: transform 0.3s ease;
+    }
+    .achievement-box:hover { transform: translateY(-6px); border-color: var(--main-green); }
+    .achievement-number { font-size: 36px; font-weight: 900; color: var(--main-green); margin-bottom: 4px; }
+    .achievement-label { font-size: 15px; font-weight: 700; color: #222222; margin-bottom: 8px; }
+    .achievement-subtext { font-size: 12px; color: #666666; line-height: 1.5; margin-bottom: 0; }
+
+    /* 5. NÚT CUỘN LÊN ĐẦU TRANG (BACK TO TOP) - ĐÃ ĐƯỢC CHỈNH CỐ ĐỊNH */
+    #backToTopBtn {
+      position: fixed;
+      bottom: 35px;
+      right: 35px;
+      width: 48px;
+      height: 48px;
+      background-color: var(--main-green);
+      color: #ffffff;
+      border: none;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+      z-index: 99999;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+    }
+
+    #backToTopBtn.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    #backToTopBtn:hover {
+      background-color: #004d25;
+      transform: translateY(-5px) scale(1.08);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NẠP HEADER CHUNG -->
+  <div id="header-include"></div>
+
+  <!-- 1. GIỚI THIỆU CHUNG -->
+  <section class="paper-section" id="gioi-thieu-chung">
+    <div class="container">
+      <div class="intro-box">
+        <h2 class="display-6 section-title" data-aos="fade-down" data-aos-duration="800">GIỚI THIỆU CHUNG</h2>
+        <div class="title-line" data-aos="zoom-in" data-aos-delay="200"></div>
+        
+        <p class="text-secondary fs-6 leading-relaxed" data-aos="fade-up" data-aos-delay="300">
+          Bông Trà là thương hiệu trà và trà sữa hiện đại, mang đến hương vị đậm đà và tinh tế. Mỗi ly trà được pha chế từ nguyên liệu tự nhiên, chọn lọc kỹ lưỡng, đảm bảo an toàn và chất lượng.
+        </p>
+
+        <ul class="intro-feature-list" data-aos="fade-up" data-aos-delay="400">
+          <li><i class="fa-solid fa-leaf text-success"></i> Nguyên liệu tự nhiên, chọn lọc kỹ càng</li>
+          <li><i class="fa-solid fa-mug-hot text-success"></i> Menu đa dạng, cập nhật xu hướng</li>
+          <li><i class="fa-solid fa-store text-success"></i> Không gian ấm cúng, gần gũi</li>
+          <li><i class="fa-solid fa-heart text-success"></i> Đội ngũ thân thiện, tận tâm với khách hàng</li>
+        </ul>
+
+        <div data-aos="zoom-in-up" data-aos-duration="1000" data-aos-delay="200">
+          <img src="/image/vebongtra.png" class="about-banner-img" alt="Bông Trà Chuẩn Vị">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. SỨ MỆNH & GIÁ TRỊ CỐT LÕI -->
+  <section class="values-bg-section" id="su-menh-gia-tri">
+    <div class="container values-container text-center">
+      <h2 class="display-6 section-title text-success" data-aos="fade-down">SỨ MỆNH & GIÁ TRỊ CỐT LÕI</h2>
+      <p class="section-subtext" data-aos="fade-up">Trở thành hệ thống trà sữa đậm bản sắc Việt, gần gũi và được khách hàng tin dùng nhất.</p>
+
+      <div class="row g-4 mt-2">
+        
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+          <div class="value-card-box">
+            <div class="value-top-icon">
+              <img src="/image/latra.jpg" alt="Lá trà">
+            </div>
+            <h6 class="value-card-title">TẦM NHÌN</h6>
+            <p class="value-card-desc">Trở thành hệ thống trà sữa đậm bản sắc Việt, gần gũi và được khách hàng tin dùng nhất.</p>
+          </div>
+        </div>
+
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="500">
+          <div class="value-card-box">
+            <div class="value-top-icon">
+              <img src="/image/latra.jpg" alt="Lá trà">
+            </div>
+            <h6 class="value-card-title">SỨ MỆNH</h6>
+            <p class="value-card-desc">Mang đến khách hàng niềm vui và hạnh phúc trong hành trình trải nghiệm sản phẩm - dịch vụ tại Bông Trà.</p>
+          </div>
+        </div>
+
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="700">
+          <div class="value-card-box">
+            <div class="value-top-icon">
+              <img src="/image/latra.jpg" alt="Lá trà">
+            </div>
+            <h6 class="value-card-title">GIÁ TRỊ CỐT LÕI</h6>
+            <p class="value-card-desc">"Nhân - Tâm - Tín - Trí" làm nền tảng cho mọi quyết định và hành động, tôn trọng và biết ơn, sáng tạo và đổi mới.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. HÀNH TRÌNH PHÁT TRIỂN -->
+  <section class="paper-section" id="hanh-trinh-phat-trien">
+    <div class="container text-center">
+      <h2 class="display-6 section-title" data-aos="fade-down">HÀNH TRÌNH PHÁT TRIỂN</h2>
+      <p class="section-subtext" data-aos="fade-up">Bông Trà tự hào với những cột mốc đáng nhớ trên hành trình phục vụ khách hàng.</p>
+
+      <div class="curved-timeline-wrapper">
+        <svg class="timeline-svg-path" viewBox="0 0 1000 1800" preserveAspectRatio="none">
+          <path d="M 500,50 Q 580,200 500,350 T 500,650 T 500,950 T 500,1250 T 500,1550" fill="none" stroke="#8cbba0" stroke-width="3" stroke-dasharray="8,8" />
+        </svg>
+
+        <!-- Mốc 1: 2016 -->
+        <div class="timeline-node-item" data-aos="fade-right">
+          <div class="timeline-leaf-icon-circle">
+            <img src="/image/latra.jpg" alt="Lá trà Bông Trà">
+          </div>
+          <div class="timeline-col-text">
+            <div class="timeline-year-text">2016</div>
+            <p class="timeline-paragraph">Ra đời năm 2016, Trà Sữa Bông Trà nhanh chóng được yêu thích nhờ hương vị đậm đà, topping chất lượng và giá hợp lý. Năm 2017, Bông Trà khai trương cửa hàng mang đi đầu tiên tại 168 Thạch Lam, mở đầu cho hành trình phát triển và trở thành điểm hẹn quen thuộc của giới trẻ.</p>
+          </div>
+          <div class="timeline-col-media">
+            <div class="timeline-card-frame">
+              <img src="/image/about-1.jpg" alt="Bông Trà 2016">
+            </div>
+          </div>
+        </div>
+
+        <!-- Mốc 2: 2020 -->
+        <div class="timeline-node-item" data-aos="fade-left">
+          <div class="timeline-leaf-icon-circle">
+            <img src="/image/latra.jpg" alt="Lá trà Bông Trà">
+          </div>
+          <div class="timeline-col-text">
+            <div class="timeline-year-text">2020</div>
+            <p class="timeline-paragraph">Tháng 08/2020, Bông Trà chuyển về địa chỉ mới tại 177 Thạch Lam và chính thức đổi tên thành Bông Trà – đánh dấu bước ngoặt trong hành trình xây dựng thương hiệu, hướng tới hình ảnh chuyên nghiệp, chỉn chu và chất lượng hơn trong mắt khách hàng.</p>
+          </div>
+          <div class="timeline-col-media">
+            <div class="timeline-card-frame">
+              <img src="/image/pham-viet-chanh.jpg" alt="Bông Trà 2020">
+            </div>
+          </div>
+        </div>
+
+        <!-- Mốc 3: 2022 -->
+        <div class="timeline-node-item" data-aos="fade-right">
+          <div class="timeline-leaf-icon-circle">
+            <img src="/image/latra.jpg" alt="Lá trà Bông Trà">
+          </div>
+          <div class="timeline-col-text">
+            <div class="timeline-year-text">2022</div>
+            <p class="timeline-paragraph">Tháng 04/2022, Bông Trà mở rộng quy mô với chi nhánh thứ 2 tại 100 Phạm Viết Chánh, có không gian ngồi lại rộng rãi. Nhờ vị trí thuận lợi, nơi đây nhanh chóng trở thành điểm đến yêu thích của học sinh, sinh viên và dân văn phòng khu vực.</p>
+          </div>
+          <div class="timeline-col-media">
+            <div class="timeline-card-frame">
+              <img src="/image/bau-cat.jpg" alt="Bông Trà 2022">
+            </div>
+          </div>
+        </div>
+
+        <!-- Mốc 4: 2023 -->
+        <div class="timeline-node-item" data-aos="fade-left">
+          <div class="timeline-leaf-icon-circle">
+            <img src="/image/latra.jpg" alt="Lá trà Bông Trà">
+          </div>
+          <div class="timeline-col-text">
+            <div class="timeline-year-text">2023</div>
+            <p class="timeline-paragraph">Tháng 04/2023, Bông Trà khai trương chi nhánh thứ 3 tại 77-79 Bầu Cát, mở rộng mô hình phục vụ để đáp ứng nhu cầu của nhiều đối tượng khách hàng – từ học sinh, sinh viên đến người đi làm – mong muốn tìm kiếm một không gian thưởng thức trà sữa thơm đậm vị, chất lượng và gần gũi.</p>
+          </div>
+          <div class="timeline-col-media">
+            <div class="timeline-card-frame">
+              <img src="/image/cong-hoa.jpg" alt="Bông Trà 2023">
+            </div>
+          </div>
+        </div>
+
+        <!-- Mốc 5: 2024 -->
+        <div class="timeline-node-item" data-aos="fade-right">
+          <div class="timeline-leaf-icon-circle">
+            <img src="/image/latra.jpg" alt="Lá trà Bông Trà">
+          </div>
+          <div class="timeline-col-text">
+            <div class="timeline-year-text">2024</div>
+            <p class="timeline-paragraph">Tháng 05/2024, Bông Trà đánh dấu cột mốc mới với chi nhánh thứ 4 tại 467 Lê Văn Thọ – không gian ngồi lại rộng rãi, thoải mái, điểm xuyết những góc check-in tối giản mà tinh tế. Thể hiện bước tiến vững chắc trong hành trình mở rộng và nâng tầm trải nghiệm thương hiệu.</p>
+          </div>
+          <div class="timeline-col-media">
+            <div class="timeline-card-frame">
+              <img src="/image/bongtra.jpg" alt="Bông Trà 2024">
+            </div>
+          </div>
+        </div>
+
+        <!-- Mốc 6: 2025 -->
+        <div class="timeline-node-item" data-aos="fade-left">
+          <div class="timeline-leaf-icon-circle">
+            <img src="/image/latra.jpg" alt="Lá trà Bông Trà">
+          </div>
+          <div class="timeline-col-text">
+            <div class="timeline-year-text">2025</div>
+            <p class="timeline-paragraph">Đầu năm 2025, Bông Trà chính thức chuyển mình trở thành Công ty Cổ phần Bông Trà F&B – cột mốc quan trọng khẳng định bước tiến vững chắc, sẵn sàng bứt phá để chinh phục mục tiêu dài hạn. Tháng 3, chuyển chi nhánh 1 về 389 Lũy Bán Bích nhằm nâng cao trải nghiệm phục vụ.</p>
+          </div>
+          <div class="timeline-col-media">
+            <div class="timeline-card-frame">
+              <img src="/image/luy-ban-bich.jpg" alt="Bông Trà 2025">
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. THÀNH TỰU CỦA BÔNG TRÀ -->
+  <section class="paper-section pt-0" id="thanh-tuu">
+    <div class="container text-center">
+      <h2 class="display-6 section-title" data-aos="fade-down">THÀNH TỰU CỦA BÔNG TRÀ</h2>
+      <p class="section-subtext" data-aos="fade-up">Những thành tựu và các chứng nhận đã đạt được trong suốt khoảng thời gian qua.</p>
+
+      <div class="row g-4">
+        
+        <div class="col-6 col-md-3" data-aos="zoom-in" data-aos-delay="200">
+          <div class="achievement-box">
+            <div class="achievement-number">1.1 Triệu+</div>
+            <div class="achievement-label">Khách hàng</div>
+            <p class="achievement-subtext">Hơn 1 triệu khách hàng tin chọn Bông Trà mỗi năm.</p>
+          </div>
+        </div>
+
+        <div class="col-6 col-md-3" data-aos="zoom-in" data-aos-delay="400">
+          <div class="achievement-box">
+            <div class="achievement-number">85.000+</div>
+            <div class="achievement-label">Sản phẩm</div>
+            <p class="achievement-subtext">85.000+ sản phẩm Bông Trà được lựa chọn mỗi tháng.</p>
+          </div>
+        </div>
+
+        <div class="col-6 col-md-3" data-aos="zoom-in" data-aos-delay="600">
+          <div class="achievement-box">
+            <div class="achievement-number">23.000+</div>
+            <div class="achievement-label">Đánh giá</div>
+            <p class="achievement-subtext">Duy trì mức đánh giá trung bình trên 4.7★ tại các nền tảng giao hàng.</p>
+          </div>
+        </div>
+
+        <div class="col-6 col-md-3" data-aos="zoom-in" data-aos-delay="800">
+          <div class="achievement-box">
+            <div class="achievement-number">5+</div>
+            <div class="achievement-label">Chi nhánh</div>
+            <p class="achievement-subtext">Hệ thống cửa hàng phủ khắp các quận lớn tại TP.HCM và đang mở rộng.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. HÀNH TRÌNH VẪN CÒN Ở PHÍA TRƯỚC -->
+  <section class="paper-section pt-0 text-center">
+    <div class="container">
+      <h3 class="fw-bold text-success mb-3">HÀNH TRÌNH VẪN CÒN Ở PHÍA TRƯỚC</h3>
+      <p class="text-secondary mx-auto" style="max-width: 650px; font-size: 14px;">
+        Nhìn lại quá khứ để trân trọng hiện tại và vững bước tới tương lai. Bông Trà cam kết tiếp tục sáng tạo và lan tỏa sự tử tế, mang đến nhiều giá trị hơn nữa cho cộng đồng.
+      </p>
+    </div>
+  </section>
+
+  <!-- NẠP FOOTER CHUNG -->
+  <div id="footer-include"></div>
+
+  <!-- NÚT BACK TO TOP HTML TRỰC TIẾP -->
+  <button id="backToTopBtn" title="Lên đầu trang">
+    <i class="fa-solid fa-chevron-up"></i>
+  </button>
+
+  <!-- JS BOOTSTRAP, AOS & XỬ LÝ NÚT BACK TO TOP -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  
+ <script>
+  function initHeaderUser() {
+    const loggedUser = localStorage.getItem('currentUser');
+    const authArea = document.getElementById('authArea');
+    if (loggedUser && authArea) {
+      authArea.innerHTML = `
+        <div class="user-dropdown-wrapper" style="position:relative; display:flex; align-items:center; cursor:pointer; height:60px;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <img src="/image/icon_toi.png" alt="Tôi" style="width:30px; height:30px; border-radius:50%; object-fit:cover; border:1.5px solid #fff;" onerror="this.src='/image/logo1.png'">
+            <span style="color:#fff; font-size:12px; font-weight:800; text-transform:uppercase;">${loggedUser}</span>
+          </div>
+          <div class="user-dropdown-content" style="display:none; position:absolute; right:0; top:60px; background:#fff; min-width:180px; box-shadow:0 8px 24px rgba(0,0,0,0.18); border-radius:8px; overflow:hidden; z-index:99999; border:1px solid #eaeaea;">
+            <a href="/tai-khoan" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Tài Khoản Của Tôi</a>
+            <a href="/don-mua" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Đơn Mua</a>
+            <a href="#" onclick="localStorage.removeItem('currentUser'); window.location.href='/'; return false;" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Đăng Xuất</a>
+          </div>
+        </div>
+      `;
+      const wrap = authArea.querySelector('.user-dropdown-wrapper');
+      const cont = authArea.querySelector('.user-dropdown-content');
+      if(wrap && cont) {
+        wrap.addEventListener('mouseenter', () => cont.style.display = 'block');
+        wrap.addEventListener('mouseleave', () => cont.style.display = 'none');
+      }
+    }
+    const cartBtn = document.querySelector('.cart-icon-btn');
+    if (cartBtn) {
+      const cart = JSON.parse(localStorage.getItem('cartList')) || [];
+      const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+      const badge = cartBtn.querySelector('.cart-badge-count');
+      if (badge) badge.innerText = totalCount;
+      cartBtn.onclick = function() {
+        if (!loggedUser) {
+          alert('Vui lòng đăng nhập để xem giỏ hàng!');
+          window.location.href = '/login';
+        } else {
+          window.location.href = '/menu';
+        }
+      };
+    }
+  }
+
+  fetch('/header.html').then(r => r.text()).then(html => { 
+    document.getElementById('header-include').innerHTML = html;
+    initHeaderUser();
+  });
+  fetch('/footer.html').then(r => r.text()).then(html => { document.getElementById('footer-include').innerHTML = html; });
+
+  AOS.init({ once: false, mirror: true, duration: 800 });
+
+  const backToTopBtn = document.getElementById('backToTopBtn');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 300) backToTopBtn.classList.add('show');
+    else backToTopBtn.classList.remove('show');
+  });
+  backToTopBtn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+</script>
+</body>
+</html>

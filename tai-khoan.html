@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tài Khoản Của Tôi - Bông Trà</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root { --main-green: #006030; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #fbf9f5 url('https://www.transparenttextures.com/patterns/paper.png');
+      color: #333;
+      padding-top: 90px;
+    }
+    .profile-wrapper { max-width: 650px; margin: 30px auto 60px; }
+    .user-card-top {
+      background: #ffffff; border-radius: 16px; padding: 24px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid #eaeaea;
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;
+    }
+    .user-info-left { display: flex; align-items: center; gap: 15px; }
+    .user-avatar { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; background: #e8f5ed; border: 2px solid var(--main-green); }
+    .tier-badge-pill {
+      background-color: #e8f5ed; color: var(--main-green); font-size: 11px; font-weight: 700;
+      padding: 4px 10px; border-radius: 20px; display: inline-block; margin-top: 4px;
+    }
+    .menu-group-card {
+      background: #ffffff; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+      border: 1px solid #eaeaea; overflow: hidden; margin-bottom: 20px;
+    }
+    .menu-item-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 20px; text-decoration: none; color: #333; border-bottom: 1px solid #f2f2f2; transition: background 0.2s;
+    }
+    .menu-item-row:last-child { border-bottom: none; }
+    .menu-item-row:hover { background-color: #f8f9fa; color: var(--main-green); }
+    .menu-item-left { display: flex; align-items: center; gap: 14px; font-size: 14px; font-weight: 600; }
+    .menu-item-left i { color: var(--main-green); font-size: 18px; width: 24px; text-align: center; }
+    .badge-sub { background-color: #ffebee; color: #c62828; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; margin-left: 6px; }
+  </style>
+</head>
+<body>
+
+  <div id="header-include"></div>
+
+  <div class="container profile-wrapper">
+    
+    <!-- KHỐI THÔNG TIN CÁ NHÂN -->
+    <div class="user-card-top">
+      <div class="user-info-left">
+        <img src="/image/icon_toi.png" alt="Avatar" class="user-avatar" onerror="this.src='/image/logo1.png'">
+        <div>
+          <h5 class="fw-bold mb-0 text-dark" id="userNameDisplay">an2</h5>
+          <span class="tier-badge-pill" id="userTierDisplay">🌱 New Member</span>
+        </div>
+      </div>
+      <button onclick="openProfileModal()" class="btn btn-sm btn-outline-success fw-bold px-3 py-1.5 rounded-pill" style="font-size: 12px;">Hồ sơ</button>
+    </div>
+
+    <!-- KHỐI ƯU ĐÃI & TÍCH ĐIỂM -->
+    <div class="menu-group-card">
+      <div class="p-3 pb-2 text-muted fw-bold" style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; background: #fafafa; border-bottom: 1px solid #eaeaea;">Ưu đãi và tích điểm</div>
+      
+      <a href="javascript:void(0)" onclick="openPointsModal()" class="menu-item-row">
+        <div class="menu-item-left">
+          <i class="fa-solid fa-coins"></i>
+          <span>Bông Điểm Tích Lũy</span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <span class="fw-bold text-success" id="userPointsDisplay">0 điểm</span>
+          <i class="fa-solid fa-chevron-right text-muted" style="font-size: 12px;"></i>
+        </div>
+      </a>
+
+      <a href="javascript:void(0)" onclick="openVipModal()" class="menu-item-row">
+        <div class="menu-item-left">
+          <i class="fa-solid fa-crown text-warning"></i>
+          <span>Hạng Thành Viên & Gói VIP <span class="badge-sub">VIP</span></span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <span class="text-muted small" id="currentTierSubText">New Member</span>
+          <i class="fa-solid fa-chevron-right text-muted" style="font-size: 12px;"></i>
+        </div>
+      </a>
+
+      <a href="/don-mua" class="menu-item-row">
+        <div class="menu-item-left">
+          <i class="fa-solid fa-receipt"></i>
+          <span>Đơn Mua Của Tôi</span>
+        </div>
+        <i class="fa-solid fa-chevron-right text-muted" style="font-size: 12px;"></i>
+      </a>
+    </div>
+
+    <!-- KHỐI TỔNG QUÁT -->
+    <div class="menu-group-card">
+      <div class="p-3 pb-2 text-muted fw-bold" style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; background: #fafafa; border-bottom: 1px solid #eaeaea;">Tổng quát</div>
+      
+      <a href="/cua-hang" class="menu-item-row">
+        <div class="menu-item-left"><i class="fa-solid fa-store"></i><span>Cửa hàng Bông Trà gần bạn</span></div>
+        <i class="fa-solid fa-chevron-right text-muted" style="font-size: 12px;"></i>
+      </a>
+
+      <a href="/lien-he" class="menu-item-row">
+        <div class="menu-item-left"><i class="fa-solid fa-headset"></i><span>Trung tâm trợ giúp & CSKH</span></div>
+        <i class="fa-solid fa-chevron-right text-muted" style="font-size: 12px;"></i>
+      </a>
+
+      <a href="#" onclick="logoutUser()" class="menu-item-row text-danger">
+        <div class="menu-item-left text-danger"><i class="fa-solid fa-right-from-bracket text-danger"></i><span>Đăng Xuất Tài Khoản</span></div>
+        <i class="fa-solid fa-chevron-right text-muted" style="font-size: 12px;"></i>
+      </a>
+    </div>
+
+  </div>
+
+  <!-- MODAL 1: HỒ SƠ -->
+  <div class="modal fade" id="profileModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg rounded-4">
+        <div class="modal-header bg-success text-white py-3">
+          <h5 class="modal-title fw-bold fs-6"><i class="fa-solid fa-user-pen me-2"></i>Hồ Sơ & Hoạt Động Của Bạn</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4 bg-light">
+          <h6 class="fw-bold text-success mb-2" style="font-size: 13.5px;"><i class="fa-solid fa-heart me-1"></i> Các món yêu thích (Mua gần đây)</h6>
+          <div id="favoriteItemsList" class="bg-white p-3 rounded-3 shadow-sm mb-3" style="font-size: 13px;"></div>
+
+          <h6 class="fw-bold text-success mb-2" style="font-size: 13.5px;"><i class="fa-solid fa-star me-1"></i> Đánh giá đã viết</h6>
+          <div id="reviewsList" class="bg-white p-3 rounded-3 shadow-sm" style="font-size: 13px;">
+            <div class="p-2 border-bottom">⭐ <strong>5/5</strong> - "Trà thơm đậm vị, trân châu dẻo ngon tuyệt!" <span class="text-muted d-block" style="font-size: 11px;">Cho đơn hàng #BT82910</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: BÔNG ĐIỂM TÍCH LŨY -->
+  <div class="modal fade" id="pointsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg rounded-4">
+        <div class="modal-header bg-success text-white py-3">
+          <h5 class="modal-title fw-bold fs-6"><i class="fa-solid fa-coins me-2"></i>Lịch Sử & Chi Tiết Bông Điểm</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4 bg-light">
+          <div class="bg-white p-3 rounded-3 shadow-sm mb-3 text-center">
+            <span class="text-muted small uppercase">Tổng số điểm hiện có</span>
+            <h2 class="fw-bold text-success my-1" id="modalTotalPoints">0 điểm</h2>
+            <p class="text-muted mb-0" style="font-size: 11.5px;">Sẽ hết hạn vào ngày 31 Thg 3 2027</p>
+          </div>
+          <h6 class="fw-bold text-dark mb-2" style="font-size: 13px;">Lịch sử cộng điểm gần đây</h6>
+          <div id="pointsHistoryList" class="bg-white p-3 rounded-3 shadow-sm" style="font-size: 13px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: HẠNG THÀNH VIÊN & ĐĂNG KÝ GÓI VIP (Khớp hình 3, 5, 6, 7) -->
+  <div class="modal fade" id="vipModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content border-0 shadow-lg rounded-4">
+        <div class="modal-header bg-success text-white py-3">
+          <h5 class="modal-title fw-bold fs-6"><i class="fa-solid fa-crown me-2 text-warning"></i>Đặc Quyền Thành Viên & Gói Hội Viên VIP</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4 bg-light">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="bg-white p-3 rounded-3 shadow-sm h-100 border-start border-4 border-success">
+                <h6 class="fw-bold text-success mb-2">Hạng của bạn hiện tại</h6>
+                <div class="fs-5 fw-bold text-dark mb-1" id="vipModalTierName">New Member</div>
+                <p class="text-muted small mb-0">Tích lũy điểm từ mỗi đơn hàng để thăng hạng Silver và Gold nhận ưu đãi giảm giá trọn đời.</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="bg-white p-3 rounded-3 shadow-sm h-100 border-start border-4 border-warning">
+                <h6 class="fw-bold text-warning mb-2">⭐ Gói Bông Trà VIP Unlimited</h6>
+                <p class="text-muted small mb-2">Giảm 12.000đ phí giao hàng, tặng voucher giảm 10k cho đơn từ 79k và nhận thêm điểm thưởng.</p>
+                <button id="registerVipBtn" class="btn btn-sm btn-success w-100 fw-bold py-2" onclick="registerVipMember()">Đăng ký ngay (Miễn phí 2 tháng)</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST THÔNG BÁO HIỆN ĐẠI (THAY CHO ALERT LOCALHOST) -->
+  <div id="customToast" class="toast align-items-center text-white bg-success border-0 position-fixed bottom-0 end-0 m-4 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true" style="z-index: 99999; border-radius: 12px;">
+    <div class="d-flex">
+      <div class="toast-body fw-bold" id="toastMessage">Đăng ký hội viên VIP thành công!</div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+  </div>
+
+  <div id="footer-include"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function showNotification(msg) {
+      document.getElementById('toastMessage').innerText = msg;
+      const toastEl = document.getElementById('customToast');
+      const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
+      toast.show();
+    }
+
+    function initHeaderUser() {
+      const loggedUser = localStorage.getItem('currentUser');
+      const isVip = localStorage.getItem('isVipMember') === 'true';
+      const authArea = document.getElementById('authArea');
+      
+      let displayName = loggedUser || 'an2';
+      if (isVip && !displayName.includes('👑')) {
+        displayName += ' 👑';
+      }
+
+      if (loggedUser && authArea) {
+        authArea.innerHTML = `
+          <div class="user-dropdown-wrapper" style="position:relative; display:flex; align-items:center; cursor:pointer; height:60px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <img src="/image/icon_toi.png" alt="Tôi" style="width:30px; height:30px; border-radius:50%; object-fit:cover; border:1.5px solid #fff;" onerror="this.src='/image/logo1.png'">
+              <span style="color:#fff; font-size:12px; font-weight:800; text-transform:uppercase;">${displayName}</span>
+            </div>
+            <div class="user-dropdown-content" style="display:none; position:absolute; right:0; top:60px; background:#fff; min-width:180px; box-shadow:0 8px 24px rgba(0,0,0,0.18); border-radius:8px; overflow:hidden; z-index:99999; border:1px solid #eaeaea;">
+              <a href="/tai-khoan" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Tài Khoản Của Tôi</a>
+              <a href="/don-mua" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Đơn Mua</a>
+              <a href="#" onclick="logoutUser(); return false;" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Đăng Xuất</a>
+            </div>
+          </div>
+        `;
+        const wrap = authArea.querySelector('.user-dropdown-wrapper');
+        const cont = authArea.querySelector('.user-dropdown-content');
+        if(wrap && cont) {
+          wrap.addEventListener('mouseenter', () => cont.style.display = 'block');
+          wrap.addEventListener('mouseleave', () => cont.style.display = 'none');
+        }
+      }
+      const cartBtn = document.querySelector('.cart-icon-btn');
+      if (cartBtn) {
+        const cart = JSON.parse(localStorage.getItem('cartList')) || [];
+        const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+        const badge = cartBtn.querySelector('.cart-badge-count');
+        if (badge) badge.innerText = totalCount;
+        cartBtn.onclick = function() {
+          if (!loggedUser) { window.location.href = '/login'; }
+          else { window.location.href = '/menu'; }
+        };
+      }
+    }
+
+    function logoutUser() {
+      localStorage.removeItem('currentUser');
+      localStorage.removeItem('isVipMember');
+      window.location.href = '/';
+    }
+
+    fetch('/header.html').then(r => r.text()).then(html => { document.getElementById('header-include').innerHTML = html; initHeaderUser(); });
+    fetch('/footer.html').then(r => r.text()).then(html => { document.getElementById('footer-include').innerHTML = html; });
+
+    let userOrders = [];
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const username = localStorage.getItem('currentUser') || 'an2';
+      document.getElementById('userNameDisplay').innerText = username;
+
+      updateVipUI();
+
+      userOrders = JSON.parse(localStorage.getItem('bongtra_orders')) || [
+        { id: 'BT82910', date: '08:21, 13 Thg 9 2026', items: [{name: 'Trà Sữa Ô Long Hoa Nhài (Size M, Ít đá)', price: 45000, qty: 1}], pointsEarned: 12 },
+        { id: 'BT71242', date: '14:10, 01 Thg 8 2026', items: [{name: 'Hồng Trà Sữa Trân Châu', price: 38000, qty: 2}], pointsEarned: 15 }
+      ];
+
+      let totalPoints = userOrders.reduce((sum, o) => sum + (o.pointsEarned || 10), 0);
+      document.getElementById('userPointsDisplay').innerText = totalPoints + ' điểm';
+      document.getElementById('modalTotalPoints').innerText = totalPoints + ' điểm';
+    });
+
+    function updateVipUI() {
+      const isVip = localStorage.getItem('isVipMember') === 'true';
+      const tierDisplay = document.getElementById('userTierDisplay');
+      const subText = document.getElementById('currentTierSubText');
+      const modalTier = document.getElementById('vipModalTierName');
+      const registerBtn = document.getElementById('registerVipBtn');
+
+      if (isVip) {
+        tierDisplay.innerHTML = '⭐ VIP Member 👑';
+        tierDisplay.style.background = '#fff8e1';
+        tierDisplay.style.color = '#f57f17';
+        subText.innerText = 'VIP Member 👑';
+        modalTier.innerText = '⭐ VIP Member (Đang hoạt động)';
+        registerBtn.innerText = 'Đã đăng ký Gói VIP';
+        registerBtn.classList.remove('btn-success');
+        registerBtn.classList.add('btn-secondary');
+        registerBtn.disabled = true;
+      } else {
+        tierDisplay.innerText = '🌱 New Member';
+        tierDisplay.style.background = '#e8f5ed';
+        tierDisplay.style.color = '#006030';
+        subText.innerText = 'New Member';
+        modalTier.innerText = 'New Member';
+        registerBtn.innerText = 'Đăng ký ngay (Miễn phí 2 tháng)';
+        registerBtn.classList.remove('btn-secondary');
+        registerBtn.classList.add('btn-success');
+        registerBtn.disabled = false;
+      }
+    }
+
+    function registerVipMember() {
+      localStorage.setItem('isVipMember', 'true');
+      updateVipUI();
+      initHeaderUser();
+      showNotification('🎉 Đăng ký gói hội viên VIP thành công! Đã kích hoạt các voucher độc quyền.');
+      bootstrap.Modal.getInstance(document.getElementById('vipModal')).hide();
+    }
+
+    function openProfileModal() {
+      let favContainer = document.getElementById('favoriteItemsList');
+      let htmlFav = '';
+      userOrders.forEach(o => {
+        o.items.forEach(item => {
+          htmlFav += `<div class="d-flex justify-content-between align-items-center py-2 border-bottom"><span>🍵 ${item.name}</span><span class="text-success fw-bold">${item.price.toLocaleString()}đ</span></div>`;
+        });
+      });
+      favContainer.innerHTML = htmlFav || '<p class="text-muted mb-0">Chưa có món mua gần đây.</p>';
+      new bootstrap.Modal(document.getElementById('profileModal')).show();
+    }
+
+    function openPointsModal() {
+      let historyContainer = document.getElementById('pointsHistoryList');
+      let htmlHistory = userOrders.map(o => `
+        <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+          <div>
+            <strong>Thưởng Bông Điểm</strong>
+            <span class="text-muted d-block" style="font-size: 11px;">Đơn hàng #${o.id} - ${o.date}</span>
+          </div>
+          <span class="text-success fw-bold">+${o.pointsEarned || 10}</span>
+        </div>
+      `).join('');
+      historyContainer.innerHTML = htmlHistory || '<p class="text-muted mb-0">Chưa có lịch sử tích điểm.</p>';
+      new bootstrap.Modal(document.getElementById('pointsModal')).show();
+    }
+
+    function openVipModal() {
+      new bootstrap.Modal(document.getElementById('vipModal')).show();
+    }
+  </script>
+</body>
+</html>

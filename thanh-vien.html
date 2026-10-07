@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đặc Quyền Thành Viên - Bông Trà</title>
+
+  <!-- BOOTSTRAP 5 & FONTAWESOME -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root { --main-green: #006030; }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #fbf9f5 url('https://www.transparenttextures.com/patterns/paper.png');
+      color: #333;
+      padding-top: 75px;
+      overflow-x: hidden;
+    }
+
+    .paper-section {
+      background: #fbf9f5 url('https://www.transparenttextures.com/patterns/paper.png');
+      padding: 60px 0;
+    }
+
+    .section-title {
+      color: var(--main-green);
+      font-weight: 800;
+      font-size: 32px;
+      letter-spacing: 0.5px;
+      margin-bottom: 25px;
+      text-transform: uppercase;
+    }
+
+    .benefit-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    .benefit-icon-box {
+      width: 48px;
+      height: 48px;
+      background-color: #e5ece7;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .benefit-icon-box img {
+      width: 26px;
+      height: 26px;
+      object-fit: contain;
+    }
+
+    .benefit-content h6 {
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 4px;
+      font-size: 15px;
+    }
+
+    .benefit-content p {
+      color: #666;
+      font-size: 12.5px;
+      line-height: 1.5;
+      margin-bottom: 0;
+    }
+
+    .member-banner-card {
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+      position: relative;
+    }
+
+    .member-banner-img {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: cover;
+    }
+
+    .tier-header-title {
+      color: var(--main-green);
+      font-weight: 800;
+      font-size: 30px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .tier-header-sub {
+      color: #666;
+      font-size: 13.5px;
+      margin-bottom: 45px;
+    }
+
+    .tier-card {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 35px 25px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+      border: 1px solid #eaeaea;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .tier-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 30px rgba(0, 96, 48, 0.15);
+    }
+
+    .tier-card.popular {
+      border: 2px solid var(--main-green);
+    }
+
+    .badge-popular {
+      position: absolute;
+      top: -14px;
+      background-color: var(--main-green);
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 16px;
+      border-radius: 20px;
+    }
+
+    .tier-icon-circle {
+      width: 65px;
+      height: 65px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+
+    .tier-icon-circle img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .tier-name {
+      font-size: 20px;
+      font-weight: 800;
+      color: #1a1a1a;
+      margin-bottom: 8px;
+    }
+
+    .tier-points {
+      font-size: 12px;
+      color: #666;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .tier-features-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      text-align: left;
+      width: 100%;
+      font-size: 12px;
+      color: #444;
+    }
+
+    .tier-features-list li {
+      margin-bottom: 12px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      line-height: 1.5;
+    }
+
+    .tier-features-list li i {
+      color: var(--main-green);
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NẠP HEADER CHUNG -->
+  <div id="header-include"></div>
+
+  <!-- SECTION 1: ĐẶC QUYỀN THÀNH VIÊN -->
+  <section class="paper-section">
+    <div class="container">
+      <div class="row g-5 align-items-center">
+        
+        <div class="col-lg-6">
+          <h2 class="section-title">ĐẶC QUYỀN THÀNH VIÊN</h2>
+
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="benefit-item">
+                <div class="benefit-icon-box">
+                  <img src="/image/icon-hopqua.jpg" alt="Đổi quà" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                  <i class="fa-solid fa-gift text-success" style="display:none;"></i>
+                </div>
+                <div class="benefit-content">
+                  <h6>Tích Điểm Đổi Quà</h6>
+                  <p>Mỗi 1.000đ chi tiêu = 1 Bông Điểm. Điểm càng nhiều, quà càng hấp dẫn.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-sm-6">
+              <div class="benefit-item">
+                <div class="benefit-icon-box">
+                  <img src="/image/icon-traitim.jpg" alt="Ưu đãi" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                  <i class="fa-solid fa-heart text-success" style="display:none;"></i>
+                </div>
+                <div class="benefit-content">
+                  <h6>Ưu Đãi Thành Viên</h6>
+                  <p>Giảm giá và đặc quyền dành riêng theo hạng thành viên.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-sm-6">
+              <div class="benefit-item">
+                <div class="benefit-icon-box">
+                  <img src="/image/icon-banhkem.jpg" alt="Quà sinh nhật" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                  <i class="fa-solid fa-cake-candles text-success" style="display:none;"></i>
+                </div>
+                <div class="benefit-content">
+                  <h6>Quà Sinh Nhật</h6>
+                  <p>Tháng sinh nhật của bạn, Bông Trà luôn có một món quà nhỏ nhỏ để chúc mừng.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-sm-6">
+              <div class="benefit-item">
+                <div class="benefit-icon-box">
+                  <img src="/image/icon-ngoisao.jpg" alt="Thăng hạng" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                  <i class="fa-solid fa-star text-success" style="display:none;"></i>
+                </div>
+                <div class="benefit-content">
+                  <h6>Thăng Hạng Dễ Dàng</h6>
+                  <p>Chi tiêu càng nhiều, hạng thành viên càng cao mở khóa thêm nhiều quyền lợi đặc biệt.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="member-banner-card">
+            <img src="/image/khach_hang.png" class="member-banner-img" alt="Bông Trà Khách Hàng Thân Thiết" onerror="this.src='/image/thanh_vien.jpg'">
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 2: CÁC HẠNG THÀNH VIÊN -->
+  <section class="paper-section pt-0">
+    <div class="container text-center">
+      <h2 class="tier-header-title">CÁC HẠNG THÀNH VIÊN</h2>
+      <p class="tier-header-sub">Mỗi cấp độ là một sự tri ân cho tình yêu của bạn dành cho Bông Trà.</p>
+
+      <div class="row g-4 justify-content-center">
+        
+        <div class="col-lg-4 col-md-6">
+          <div class="tier-card">
+            <div class="tier-icon-circle">
+              <img src="/image/icon_la.jpg" alt="Icon Lá Bông Trà" onerror="this.src='/image/logo.png'">
+            </div>
+            <h3 class="tier-name">New Member</h3>
+            <div class="tier-points">0 - 2.999 điểm</div>
+            <ul class="tier-features-list">
+              <li><i class="fa-solid fa-circle-check"></i> <span>Tích điểm trên mỗi hóa đơn.</span></li>
+              <li><i class="fa-solid fa-circle-check"></i> <span>Nhận thông tin ưu đãi sớm nhất.</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6">
+          <div class="tier-card popular">
+            <span class="badge-popular">Phổ biến</span>
+            <div class="tier-icon-circle">
+              <img src="/image/icon_la.jpg" alt="Icon Lá Bông Trà" onerror="this.src='/image/logo.png'">
+            </div>
+            <h3 class="tier-name">Silver Member</h3>
+            <div class="tier-points">
+              Điểm tích lũy: 3.000 điểm<br>
+              <span class="text-muted fw-normal" style="font-size: 11px;">Điểm duy trì: 1.500 điểm</span>
+            </div>
+            <ul class="tier-features-list">
+              <li><i class="fa-solid fa-circle-check"></i> <span>Giảm 5% cho các hóa đơn mua hàng và các chương trình ưu đãi khuyến mãi khác.</span></li>
+              <li><i class="fa-solid fa-circle-check"></i> <span>Nhận eVoucher 100k trong tháng sinh nhật.</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6">
+          <div class="tier-card">
+            <div class="tier-icon-circle">
+              <img src="/image/icon_la.jpg" alt="Icon Lá Bông Trà" onerror="this.src='/image/logo.png'">
+            </div>
+            <h3 class="tier-name">Gold Member</h3>
+            <div class="tier-points">
+              Điểm tích lũy: 5.000 điểm<br>
+              <span class="text-muted fw-normal" style="font-size: 11px;">Điểm duy trì: 2.500 điểm</span>
+            </div>
+            <ul class="tier-features-list">
+              <li><i class="fa-solid fa-circle-check"></i> <span>Giảm 10% cho các hóa đơn mua hàng và các chương trình ưu đãi khuyến mãi khác.</span></li>
+              <li><i class="fa-solid fa-circle-check"></i> <span>Nhận eVoucher 200k trong tháng sinh nhật.</span></li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- NẠP FOOTER CHUNG -->
+  <div id="footer-include"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+  function initHeaderUser() {
+    const loggedUser = localStorage.getItem('currentUser');
+    const authArea = document.getElementById('authArea');
+    if (loggedUser && authArea) {
+      authArea.innerHTML = `
+        <div class="user-dropdown-wrapper" style="position:relative; display:flex; align-items:center; cursor:pointer; height:60px;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <img src="/image/icon_toi.png" alt="Tôi" style="width:30px; height:30px; border-radius:50%; object-fit:cover; border:1.5px solid #fff;" onerror="this.src='/image/logo1.png'">
+            <span style="color:#fff; font-size:12px; font-weight:800; text-transform:uppercase;">${loggedUser}</span>
+          </div>
+          <div class="user-dropdown-content" style="display:none; position:absolute; right:0; top:60px; background:#fff; min-width:180px; box-shadow:0 8px 24px rgba(0,0,0,0.18); border-radius:8px; overflow:hidden; z-index:99999; border:1px solid #eaeaea;">
+            <a href="/tai-khoan" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Tài Khoản Của Tôi</a>
+            <a href="/don-mua" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Đơn Mua</a>
+            <a href="#" onclick="localStorage.removeItem('currentUser'); window.location.href='/'; return false;" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Đăng Xuất</a>
+          </div>
+        </div>
+      `;
+      const wrap = authArea.querySelector('.user-dropdown-wrapper');
+      const cont = authArea.querySelector('.user-dropdown-content');
+      if(wrap && cont) {
+        wrap.addEventListener('mouseenter', () => cont.style.display = 'block');
+        wrap.addEventListener('mouseleave', () => cont.style.display = 'none');
+      }
+    }
+    const cartBtn = document.querySelector('.cart-icon-btn');
+    if (cartBtn) {
+      const cart = JSON.parse(localStorage.getItem('cartList')) || [];
+      const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+      const badge = cartBtn.querySelector('.cart-badge-count');
+      if (badge) badge.innerText = totalCount;
+      cartBtn.onclick = function() {
+        if (!loggedUser) {
+          alert('Vui lòng đăng nhập để xem giỏ hàng!');
+          window.location.href = '/login';
+        } else {
+          window.location.href = '/menu';
+        }
+      };
+    }
+  }
+
+  fetch('/header.html').then(r => r.text()).then(html => { 
+    document.getElementById('header-include').innerHTML = html;
+    initHeaderUser();
+  });
+  fetch('/footer.html').then(r => r.text()).then(html => { document.getElementById('footer-include').innerHTML = html; });
+</script>
+</body>
+</html>

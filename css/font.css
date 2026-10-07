@@ -1,0 +1,41 @@
+
+@font-face {
+  font-family: 'Sora-Bold';
+  font-style: normal;
+  font-weight: 100 800;
+  src: url(../font/Sora_wght__1.ttf) format(truetype);
+}
+
+		
+@font-face {
+  font-family: 'Inter-Regular';
+  font-style: normal;
+  font-weight: 100 900;
+  src: url(../font/Inter_1.ttf) format(truetype);
+}
+
+		
+@font-face {
+  font-family: 'Inter-Semi Bold';
+  font-style: normal;
+  font-weight: 100 900;
+  src: url(../font/Inter_1.ttf) format(truetype);
+}
+
+		
+@font-face {
+  font-family: 'JetBrains Mono-Bold';
+  font-style: normal;
+  font-weight: 700;
+  src: url(../font/JetBrainsMono-Bold_1.ttf) format(truetype);
+}
+
+		
+@font-face {
+  font-family: 'JetBrains Mono-Medium';
+  font-style: normal;
+  font-weight: 500;
+  src: url(../font/JetBrainsMono-Medium_1.ttf) format(truetype);
+}
+
+		

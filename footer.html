@@ -1,0 +1,230 @@
+<style>
+  :root { --main-green: #006030; }
+
+  .footer-bongtra {
+    background-color: var(--main-green);
+    color: #ffffff;
+    padding: 50px 0 20px;
+    font-size: 13px;
+    line-height: 1.8;
+  }
+
+  .footer-title {
+    font-size: 15px;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    letter-spacing: 0.5px;
+  }
+
+  /* Khối Icon Mạng Xã Hội Tròn Nền Trắng */
+  .social-icons-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-top: 15px;
+  }
+
+  .social-icon-circle {
+    width: 48px;
+    height: 48px;
+    background-color: #ffffff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  }
+
+  .social-icon-circle:hover {
+    transform: translateY(-5px) scale(1.08);
+    box-shadow: 0 8px 18px rgba(0,0,0,0.25);
+  }
+
+  .social-icon-circle img {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    border-radius: 50%;
+  }
+
+  /* FontAwesome Fallback Icon nếu ảnh bị lỗi */
+  .social-icon-circle i {
+    font-size: 24px;
+    color: var(--main-green);
+  }
+
+  .footer-input-box {
+    display: flex;
+    background: #ffffff;
+    border-radius: 6px;
+    overflow: hidden;
+    padding: 2px;
+    margin-top: 10px;
+  }
+
+  .footer-input-box input {
+    border: none;
+    padding: 8px 12px;
+    font-size: 12px;
+    outline: none;
+    width: 100%;
+    color: #333;
+  }
+
+  .footer-input-box button {
+    background-color: var(--main-green);
+    color: #ffffff;
+    border: 1px solid var(--main-green);
+    padding: 6px 18px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .footer-input-box button:hover {
+    background-color: #004d25;
+  }
+
+  .footer-bottom-bar {
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    padding-top: 20px;
+    margin-top: 40px;
+    text-align: center;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  /* CSS NÚT BACK TO TOP */
+  #backToTopBtn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 45px;
+    height: 45px;
+    background-color: var(--main-green);
+    color: #ffffff;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+  }
+
+  #backToTopBtn.show {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  #backToTopBtn:hover {
+    background-color: #004d25;
+    transform: translateY(-4px) scale(1.08);
+  }
+</style>
+
+<footer class="footer-bongtra">
+  <div class="container">
+    <div class="row g-4 align-items-start">
+      
+      <!-- Cột 1: Thông Tin Công Ty -->
+      <div class="col-lg-4 text-center text-lg-start">
+        <div class="mb-3">
+          <img src="/image/logo.png" alt="Bông Trà Logo" style="width: 75px; height: auto;" onerror="this.src='/image/logo1.png'">
+          <h5 class="fw-bold mt-2 mb-3" style="letter-spacing: 1px;">BÔNG TRÀ</h5>
+        </div>
+        <p class="fw-bold mb-1">Công ty Cổ phần Bông Trà F&B</p>
+        <p class="mb-1"><i class="fa-solid fa-location-dot me-2"></i>389 Lũy Bán Bích, Phường Phú Thạnh, TP. HCM</p>
+        <p class="mb-1"><i class="fa-solid fa-id-card me-2"></i>Mã số thuế: 0318818608</p>
+        <p class="mb-0"><i class="fa-solid fa-envelope me-2"></i>Email liên hệ: cskh@bongtra.vn</p>
+      </div>
+
+      <!-- Cột 2: Tuyển Dụng & Mạng Xã Hội -->
+      <div class="col-lg-4 text-center">
+        <h6 class="footer-title">TUYỂN DỤNG</h6>
+        <p class="mb-1">Facebook: Bông Trà Tuyển Dụng</p>
+        <p class="mb-4">Email: hr@bongtra.vn</p>
+
+        <h6 class="footer-title mb-2">MẠNG XÃ HỘI</h6>
+        
+        <div class="social-icons-box">
+          <a href="https://facebook.com" target="_blank" class="social-icon-circle" title="Facebook">
+            <img src="/image/icon_facebook.jpg" alt="Facebook" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <i class="fa-brands fa-facebook-f" style="display:none;"></i>
+          </a>
+
+          <a href="https://instagram.com" target="_blank" class="social-icon-circle" title="Instagram">
+            <img src="/image/icon_insta.avif" alt="Instagram" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <i class="fa-brands fa-instagram" style="display:none; color: #e1306c;"></i>
+          </a>
+
+          <a href="https://tiktok.com" target="_blank" class="social-icon-circle" title="TikTok">
+            <img src="/image/icon_tiktok.jpg" alt="TikTok" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <i class="fa-brands fa-tiktok" style="display:none; color: #000000;"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Cột 3: Liên Hệ & CSKH -->
+      <div class="col-lg-4 text-center text-lg-start">
+        <h6 class="footer-title">LIÊN HỆ & CSKH</h6>
+        <p class="mb-1">Fanpage: Bông Trà</p>
+        <p class="mb-1">Hotline: Cửa hàng</p>
+        <p class="mb-3">Email: cskh@bongtra.vn</p>
+
+        <p class="small mb-1 opacity-90">Nếu bạn cần hỗ trợ, vui lòng để lại số điện thoại. Bông Trà sẽ sớm liên hệ để hỗ trợ cho bạn!</p>
+        
+        <div class="footer-input-box">
+          <input type="text" placeholder="Nhập số điện thoại">
+          <button type="button">Gửi</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Thanh Bản Quyền Bên Dưới -->
+    <div class="footer-bottom-bar">
+      Copyright © 2026 Bông Trà F&B. All rights reserved.
+    </div>
+  </div>
+</footer>
+
+<!-- Nút Back to Top -->
+<button id="backToTopBtn" title="Lên đầu trang">
+  <i class="fa-solid fa-chevron-up"></i>
+</button>
+
+<!-- Script xử lý cuộn lên đầu trang -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const backToTopBtn = document.getElementById('backToTopBtn');
+
+    if (backToTopBtn) {
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) {
+          backToTopBtn.classList.add('show');
+        } else {
+          backToTopBtn.classList.remove('show');
+        }
+      });
+
+      backToTopBtn.addEventListener('click', () => {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      });
+    }
+  });
+</script>

@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bông Trà - Trà & Trà Sữa Đậm Vị</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root { --main-green: #006030; }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #fbf9f5 url('https://www.transparenttextures.com/patterns/paper.png');
+      color: #333;
+      overflow-x: hidden;
+      padding-top: 60px;
+    }
+
+    .paper-section {
+      background: #fbf9f5 url('https://www.transparenttextures.com/patterns/paper.png');
+      padding: 60px 0;
+    }
+
+    /* BANNER CAROUSEL */
+    .carousel-item img {
+      height: 600px;
+      width: 100%;
+      object-fit: cover;
+      object-position: center top;
+    }
+
+    @media (max-width: 768px) {
+      .carousel-item img { height: 360px; }
+    }
+
+    /* Layout 3 Ảnh Xếp Lớp Khối Về Bông Trà */
+    .about-3img-container {
+      position: relative;
+      height: 380px;
+      width: 100%;
+    }
+    .about-img-sub1 {
+      position: absolute; top: 0; left: 0;
+      width: 120px; height: 160px;
+      object-fit: cover; border-radius: 12px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+      z-index: 1; transition: transform 0.3s ease;
+    }
+    .about-img-main {
+      position: absolute; top: 25px; left: 70px;
+      width: 230px; height: 300px;
+      object-fit: cover; border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      z-index: 2; transition: transform 0.3s ease;
+    }
+    .about-img-sub2 {
+      position: absolute; bottom: 10px; left: 175px;
+      width: 150px; height: 140px;
+      object-fit: cover; border-radius: 12px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.18);
+      z-index: 3; transition: transform 0.3s ease;
+    }
+
+    .about-3img-container:hover .about-img-sub1 { transform: translateY(-8px) rotate(-2deg); }
+    .about-3img-container:hover .about-img-main { transform: translateY(-10px); }
+    .about-3img-container:hover .about-img-sub2 { transform: translateY(-8px) rotate(2deg); }
+
+    .btn-more-about {
+      border: 1px solid var(--main-green);
+      color: var(--main-green);
+      background: transparent;
+      padding: 8px 22px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      text-decoration: none;
+      display: inline-block;
+      transition: all 0.3s ease;
+    }
+    .btn-more-about:hover {
+      background: var(--main-green);
+      color: #ffffff;
+      transform: translateY(-3px);
+    }
+
+    /* Section Best Seller Nền Đồi Trà & Cuộn Ngang Chuẩn 5 Cột */
+    .bestseller-section {
+      background: url('/image/anh_nen_1.jpg') center/cover no-repeat fixed;
+      padding: 70px 0;
+      position: relative;
+    }
+    .bestseller-section::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.45);
+      z-index: 1;
+    }
+    .bestseller-container { position: relative; z-index: 2; }
+
+    .bestseller-scroll-wrapper {
+      display: flex;
+      gap: 20px;
+      overflow-x: auto;
+      padding: 10px 5px 25px 5px;
+      scroll-behavior: smooth;
+    }
+    .bestseller-scroll-wrapper::-webkit-scrollbar { height: 6px; }
+    .bestseller-scroll-wrapper::-webkit-scrollbar-thumb { background: #00b050; border-radius: 10px; }
+
+    .product-card {
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 18px 14px;
+      text-align: center;
+      flex: 0 0 240px; /* Cố định chiều rộng mỗi thẻ để hiển thị hoàn hảo 5 cột cuộn ngang */
+      min-width: 240px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+      position: relative;
+      transition: transform 0.35s ease, box-shadow 0.35s;
+      cursor: pointer;
+    }
+    .product-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.25);
+    }
+
+    .badge-bestseller {
+      position: absolute;
+      top: 10px; right: 10px;
+      background-color: var(--main-green);
+      color: #ffffff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+    .product-img-box { width: 100%; height: 160px; display: flex; align-items: center; justify-content: center; margin: 10px 0; }
+    .product-img { max-height: 155px; object-fit: contain; transition: transform 0.3s; }
+    .product-card:hover .product-img { transform: scale(1.08); }
+    .product-title { font-size: 13.5px; font-weight: 700; color: #222; margin-bottom: 6px; text-transform: uppercase; }
+    .product-desc { font-size: 11.5px; color: #666; line-height: 1.4; height: 32px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; margin-bottom: 10px; }
+    .product-price { font-size: 16px; font-weight: 800; color: #000000; margin-bottom: 10px; text-align: left; }
+    
+    .product-actions-bar {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      width: 100%;
+      padding: 0 5px;
+      margin-top: 5px;
+      min-height: 40px;
+    }
+
+    .btn-product-cart {
+      width: 38px; height: 38px; border-radius: 50%; background: #e8f5e9; border: 1.5px solid #a5d6a7;
+      display: flex; align-items: center; justify-content: center; color: #006030; cursor: pointer; transition: 0.2s;
+    }
+    .btn-product-cart:hover { background: #006030; color: #fff; border-color: #006030; }
+
+    .product-qty-badge {
+      width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid #00b050;
+      display: flex; align-items: center; justify-content: center; color: #00b050; font-weight: 700; font-size: 14px; background: #fff;
+      cursor: pointer; transition: transform 0.2s;
+    }
+    .product-qty-badge:hover { transform: scale(1.1); background: #e8f5e9; }
+
+    /* MODAL TÙY CHỌN SẢN PHẨM */
+    .product-modal-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6);
+      z-index: 99999; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: 0.3s;
+    }
+    .product-modal-overlay.active { opacity: 1; visibility: visible; }
+    .product-modal-container {
+      background: #fff; width: 100%; max-width: 480px; max-height: 90vh; border-radius: 16px;
+      overflow-y: auto; position: relative; box-shadow: 0 15px 40px rgba(0,0,0,0.25); padding-bottom: 20px;
+      transform: translateY(20px); transition: transform 0.3s ease;
+    }
+    .product-modal-overlay.active .product-modal-container { transform: translateY(0); }
+    .modal-close-btn { position: absolute; top: 15px; left: 15px; background: none; border: none; font-size: 20px; cursor: pointer; z-index: 10; }
+    .modal-header-info { display: flex; gap: 15px; padding: 25px 20px 15px; border-bottom: 1px solid #eaeaea; }
+    .modal-product-img { width: 90px; height: 90px; object-fit: contain; border-radius: 10px; }
+    .modal-section-box { padding: 15px 20px; border-bottom: 8px solid #f7f7f7; }
+    .modal-option-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f2f2f2; cursor: pointer; }
+    .modal-footer-bar { position: sticky; bottom: 0; background: #fff; padding: 15px 20px; border-top: 1px solid #eaeaea; display: flex; gap: 15px; }
+    .btn-add-to-cart-modal { flex-grow: 1; background: #00b050; color: #fff; border: none; border-radius: 10px; padding: 12px; font-weight: 700; cursor: pointer; }
+
+    /* DRAWER GIỎ HÀNG */
+    .cart-drawer-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6);
+      z-index: 999999; display: flex; justify-content: flex-end; opacity: 0; visibility: hidden; transition: 0.3s;
+    }
+    .cart-drawer-overlay.active { opacity: 1; visibility: visible; }
+    .cart-drawer-container { background: #fff; width: 100%; max-width: 450px; height: 100%; display: flex; flex-direction: column; justify-content: space-between; transform: translateX(100%); transition: transform 0.3s ease; }
+    .cart-drawer-overlay.active .cart-drawer-container { transform: translateX(0); }
+    .cart-drawer-header { padding: 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+    .cart-drawer-body { padding: 20px; overflow-y: auto; flex-grow: 1; }
+    .cart-item-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
+    .cart-drawer-footer { padding: 20px; border-top: 1px solid #eee; background: #fff; }
+    .btn-checkout-main { width: 100%; background: #00b050; color: #fff; border: none; border-radius: 8px; padding: 14px; font-weight: 700; text-align: center; display: block; text-decoration: none; }
+
+    /* KHỐI TIN TỨC - KHUYẾN MÃI CUỘN NGANG */
+    .news-scroll-wrapper {
+      display: flex; gap: 16px; overflow-x: auto; padding: 10px 5px 20px 5px; scroll-behavior: smooth;
+    }
+    .news-scroll-wrapper::-webkit-scrollbar { height: 6px; }
+    .news-scroll-wrapper::-webkit-scrollbar-thumb { background: #006030; border-radius: 10px; }
+    .news-card-item {
+      flex: 0 0 calc(25% - 12px); min-width: 260px; background: #ffffff; border-radius: 14px; overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06); border: 1px solid #eaeaea; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; transition: 0.35s;
+    }
+    .news-card-item:hover { transform: translateY(-8px); box-shadow: 0 12px 25px rgba(0, 96, 48, 0.18); }
+    .news-card-img-box { width: 100%; height: 340px; overflow: hidden; }
+    .news-card-img-box img { width: 100%; height: 100%; object-fit: cover; transition: 0.4s; }
+    .news-card-item:hover .news-card-img-box img { transform: scale(1.05); }
+    .news-card-content { padding: 14px; text-align: left; display: flex; flex-direction: column; justify-content: space-between; flex-grow: 1; }
+    .news-tag-badge { background-color: #006030; color: #ffffff; font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 12px; display: inline-block; width: fit-content; margin-bottom: 10px; text-transform: uppercase; }
+    .news-card-heading { font-size: 13px; font-weight: 700; color: #1a1a1a; line-height: 1.4; height: 38px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; margin-bottom: 12px; text-transform: uppercase; }
+    .news-card-meta { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #777777; border-top: 1px solid #f0f0f0; padding-top: 10px; }
+    .news-detail-btn { color: #006030; font-weight: 700; text-decoration: none; font-size: 11px; }
+
+    /* KHỐI CỬA HÀNG */
+    .store-main-card { background: white; border-radius: 12px; border: 1px solid #e0e0e0; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    .store-main-img { width: 100%; height: 260px; object-fit: cover; }
+    .store-hover-card { position: relative; border-radius: 12px; overflow: hidden; height: 200px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .store-hover-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
+    .store-hover-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0, 0, 0, 0.85)); padding: 15px; color: white; transition: all 0.35s ease; }
+    .store-title-text { font-size: 14px; font-weight: 700; margin-bottom: 0; text-transform: uppercase; }
+    .store-address-text { font-size: 12px; opacity: 0; max-height: 0; overflow: hidden; transition: all 0.35s ease; margin-top: 0; color: #dddddd; }
+    .store-hover-card:hover .store-hover-img { transform: scale(1.08); }
+    .store-hover-card:hover .store-hover-overlay { background: rgba(0, 96, 48, 0.92); padding-top: 20px; }
+    .store-hover-card:hover .store-address-text { opacity: 1; max-height: 50px; margin-top: 6px; }
+  </style>
+</head>
+<body>
+
+  <!-- NẠP HEADER -->
+  <div id="header-include"></div>
+
+  <!-- MODAL TÙY CHỌN SẢN PHẨM -->
+  <div class="product-modal-overlay" id="productModal" onclick="checkCloseModal(event)">
+    <div class="product-modal-container" onclick="event.stopPropagation()">
+      <button class="modal-close-btn" onclick="closeProductModal()"><i class="fa-solid fa-xmark"></i></button>
+      
+      <div class="modal-header-info">
+        <img src="" id="modalImg" class="modal-product-img" alt="Product">
+        <div>
+          <h5 class="fw-bold text-uppercase" id="modalTitle">TÊN SẢN PHẨM</h5>
+          <p class="text-muted small" id="modalDesc">Mô tả...</p>
+          <div class="fw-bold" id="modalBasePrice">0 đ</div>
+        </div>
+      </div>
+
+      <!-- Độ Ngọt -->
+      <div class="modal-section-box">
+        <h6 class="fw-bold text-uppercase mb-2">Độ Ngọt <span class="small text-muted float-end">Pick 1</span></h6>
+        <label class="modal-option-item"><input type="radio" name="sweetness" value="Ngọt bình thường"> Ngọt bình thường</label>
+        <label class="modal-option-item"><input type="radio" name="sweetness" value="Ngọt 70%"> Ngọt 70%</label>
+        <label class="modal-option-item"><input type="radio" name="sweetness" value="Ngọt 50%"> Ngọt 50%</label>
+        <label class="modal-option-item"><input type="radio" name="sweetness" value="Ngọt 30%"> Ngọt 30%</label>
+      </div>
+
+      <!-- Mức Đá -->
+      <div class="modal-section-box">
+        <h6 class="fw-bold text-uppercase mb-2">Mức Đá <span class="small text-muted float-end">Pick 1</span></h6>
+        <label class="modal-option-item"><input type="radio" name="ice" value="Đá 100%"> Đá 100%</label>
+        <label class="modal-option-item"><input type="radio" name="ice" value="Đá 70%"> Đá 70%</label>
+        <label class="modal-option-item"><input type="radio" name="ice" value="Đá 50%"> Đá 50%</label>
+        <label class="modal-option-item"><input type="radio" name="ice" value="Đá 30%"> Đá 30%</label>
+        <label class="modal-option-item"><input type="radio" name="ice" value="Đá 0%"> Đá 0%</label>
+      </div>
+
+      <!-- TOPPING -->
+      <div class="modal-section-box">
+        <h6 class="fw-bold text-uppercase mb-2">Topping <span class="small text-muted float-end">Tùy chọn</span></h6>
+        <div id="modalToppingContainer"></div>
+      </div>
+
+      <!-- ĂN VẶT -->
+      <div class="modal-section-box">
+        <h6 class="fw-bold text-uppercase mb-2">Ăn Vặt <span class="small text-muted float-end">Tùy chọn</span></h6>
+        <div id="modalAnVatContainer"></div>
+      </div>
+
+      <div class="modal-section-box border-bottom-0">
+        <h6 class="fw-bold text-uppercase mb-2">Yêu cầu đặc biệt</h6>
+        <textarea id="modalSpecialReq" class="form-control form-control-sm" rows="2" placeholder="Ví dụ: Ít đá..."></textarea>
+      </div>
+
+      <div class="modal-footer-bar">
+        <div class="d-flex align-items-center border rounded overflow-hidden">
+          <button class="btn btn-light px-3" onclick="updateModalQty(-1)">-</button>
+          <input type="text" id="modalQtyInput" class="text-center border-0" style="width: 40px;" value="1" readonly>
+          <button class="btn btn-light px-3" onclick="updateModalQty(1)">+</button>
+        </div>
+        <button class="btn-add-to-cart-modal" id="modalAddToCartBtn" onclick="confirmAddToCart()">Thêm vào giỏ - 0 đ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DRAWER GIỎ HÀNG -->
+  <div class="cart-drawer-overlay" id="cartDrawer" onclick="checkCloseCart(event)">
+    <div class="cart-drawer-container" onclick="event.stopPropagation()">
+      <div class="cart-drawer-header">
+        <h5 class="fw-bold mb-0 text-success"><i class="fa-solid fa-bag-shopping me-2"></i>Giỏ đồ ăn</h5>
+        <button class="btn-close" onclick="toggleCartDrawer(false)"></button>
+      </div>
+      <div class="cart-drawer-body" id="cartDrawerBody"></div>
+      <div class="cart-drawer-footer">
+        <div class="d-flex justify-content-between mb-3">
+          <span class="fw-bold">Tổng cộng</span>
+          <span class="fw-bold fs-5 text-success" id="cartDrawerTotal">0 đ</span>
+        </div>
+        <a href="/thanh-toan" class="btn-checkout-main" onclick="goToCheckout(event)">Xem lại đơn hàng</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDER BANNER CAROUSEL -->
+  <div id="mainBannerCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3500">
+    <div class="carousel-inner">
+      <div class="carousel-item active"><img src="/image/banner-1.jpg" class="d-block w-100" alt="Banner 1"></div>
+      <div class="carousel-item"><img src="/image/banner-2.png" class="d-block w-100" alt="Banner 2"></div>
+      <div class="carousel-item"><img src="/image/banner-3.png" class="d-block w-100" alt="Banner 3"></div>
+    </div>
+  </div>
+
+  <!-- KHỐI VỀ BÔNG TRÀ -->
+  <section class="paper-section">
+    <div class="container py-3">
+      <div class="row align-items-center g-4">
+        <div class="col-lg-5">
+          <div class="about-3img-container">
+            <img src="/image/about-1.jpg" class="about-img-sub1" alt="Bông Trà About 1">
+            <img src="/image/about-2.jpg" class="about-img-main" alt="Bông Trà About 2">
+            <img src="/image/about-3.jpg" class="about-img-sub2" alt="Bông Trà About 3">
+          </div>
+        </div>
+        <div class="col-lg-7 ps-lg-4">
+          <h2 class="display-6 fw-bold text-success mb-3" style="letter-spacing: 0.5px;">VỀ BÔNG TRÀ</h2>
+          <div style="width: 80px; height: 3px; background-color: var(--main-green); margin-bottom: 20px;"></div>
+          <p class="text-secondary fs-6 mb-3" style="line-height: 1.8;">
+            Bông Trà là thương hiệu trà và trà sữa hiện đại, mang phong cách trà đậm vị và tinh tế, gần gũi với mọi thế hệ. Mỗi ly trà được pha chế từ nguyên liệu tự nhiên, chọn lọc kỹ lưỡng, đảm bảo an toàn và chất lượng.
+          </p>
+          <a href="/gioi-thieu" class="btn-more-about">Tìm hiểu thêm <i class="fa-solid fa-chevron-right ms-1"></i></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION SẢN PHẨM BEST SELLER (CUỘN NGANG ĐÚNG ẢNH TỪ DATABASE) -->
+  <section class="bestseller-section">
+    <div class="container bestseller-container text-center">
+      <h2 class="display-6 fw-bold text-white mb-2">SẢN PHẨM BEST SELLER</h2>
+      <p class="text-white-50 small mb-4">Các sản phẩm đang được ưa chuộng và bán chạy trên tất cả hệ thống tại Bông Trà</p>
+      
+      <div class="bestseller-scroll-wrapper" id="bestsellerProductsContainer">
+        <!-- Render động từ DB -->
+      </div>
+    </div>
+  </section>
+
+  <!-- KHỐI TIN TỨC - KHUYẾN MÃI -->
+  <section class="paper-section">
+    <div class="container text-center">
+      <h2 class="display-6 fw-bold text-success mb-2">TIN TỨC - KHUYẾN MÃI</h2>
+      <div style="width: 80px; height: 3px; background-color: #006030; margin: 0 auto 30px;"></div>
+
+      <div class="news-scroll-wrapper">
+        <div class="news-card-item">
+          <div class="news-card-img-box"><img src="/image/khuyenmai-1.jpg" alt="Uống trà nhận văn hóa" onerror="this.src='/image/banner-1.jpg'"></div>
+          <div class="news-card-content">
+            <div><span class="news-tag-badge">Bông Trà Ưu Đãi</span><h6 class="news-card-heading">UỐNG TRÀ NHẬN MỘT CHÚT VĂN HÓA VIỆT</h6></div>
+            <div class="news-card-meta"><span><i class="fa-regular fa-calendar me-1"></i>3 thg 09, 2026</span><a href="/tin-tuc" class="news-detail-btn">Xem chi tiết</a></div>
+          </div>
+        </div>
+        <div class="news-card-item">
+          <div class="news-card-img-box"><img src="/image/khuyenmai-2.jpg" alt="Mang nét Việt" onerror="this.src='/image/banner-1.jpg'"></div>
+          <div class="news-card-content">
+            <div><span class="news-tag-badge">Bông Trà Ưu Đãi</span><h6 class="news-card-heading">MANG MỘT NÉT VIỆT VỀ GÓC NHỎ CỦA BẠN</h6></div>
+            <div class="news-card-meta"><span><i class="fa-regular fa-calendar me-1"></i>25 thg 08, 2026</span><a href="/tin-tuc" class="news-detail-btn">Xem chi tiết</a></div>
+          </div>
+        </div>
+        <div class="news-card-item">
+          <div class="news-card-img-box"><img src="/image/khuyenmai-3.jpg" alt="Chạm văn hóa" onerror="this.src='/image/banner-1.jpg'"></div>
+          <div class="news-card-content">
+            <div><span class="news-tag-badge">Tin Tức Bông Trà</span><h6 class="news-card-heading">CHẠM VĂN HOÁ - KHƠI TỰ HÀO</h6></div>
+            <div class="news-card-meta"><span><i class="fa-regular fa-calendar me-1"></i>25 thg 08, 2026</span><a href="/tin-tuc" class="news-detail-btn">Xem chi tiết</a></div>
+          </div>
+        </div>
+        <div class="news-card-item">
+          <div class="news-card-img-box"><img src="/image/khuyenmai-4.jpg" alt="Giao diện thêm xinh" onerror="this.src='/image/banner-1.jpg'"></div>
+          <div class="news-card-content">
+            <div><span class="news-tag-badge">Bông Trà Ưu Đãi</span><h6 class="news-card-heading">GIAO DIỆN THÊM XINH, KHAO QUÀ LINH ĐÌNH</h6></div>
+            <div class="news-card-meta"><span><i class="fa-regular fa-calendar me-1"></i>17 thg 07, 2026</span><a href="/tin-tuc" class="news-detail-btn">Xem chi tiết</a></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- KHỐI DANH SÁCH CỬA HÀNG -->
+  <section class="paper-section pt-0">
+    <div class="container text-center">
+      <h2 class="display-6 fw-bold text-success mb-2">DANH SÁCH CỬA HÀNG</h2>
+      <div style="width: 80px; height: 3px; background-color: var(--main-green); margin: 0 auto 30px;"></div>
+
+      <div class="store-main-card text-start mb-4">
+        <div class="row g-0 align-items-center">
+          <div class="col-md-5"><img src="/image/luy-ban-bich.jpg" class="store-main-img" alt="Bông Trà Lũy Bán Bích"></div>
+          <div class="col-md-7 p-4">
+            <h4 class="fw-bold text-success mb-3">BÔNG TRÀ LŨY BÁN BÍCH</h4>
+            <p class="text-secondary mb-2"><i class="fa-solid fa-location-dot me-2 text-success"></i>389 Lũy Bán Bích, Phường Hiệp Tân, TP.Hồ Chí Minh</p>
+            <p class="text-secondary mb-2"><i class="fa-solid fa-phone me-2 text-success"></i>Hotline: 0768 530 492</p>
+            <p class="text-secondary mb-3"><i class="fa-regular fa-clock me-2 text-success"></i>Giờ mở cửa: 09:00 - 23:00</p>
+            <div class="d-flex gap-2">
+              <span class="badge border border-success text-success p-2">Web Order</span>
+              <span class="badge border border-success text-success p-2">GrabFood</span>
+              <span class="badge border border-success text-success p-2">ShopeeFood</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-3 text-start">
+        <div class="col-md-4">
+          <div class="store-hover-card">
+            <img src="/image/tran-hung-dao.jpg" class="store-hover-img" alt="Bông Trà Lũy Bán Bích">
+            <div class="store-hover-overlay"><h6 class="store-title-text">BÔNG TRÀ TRẦN HƯNG ĐẠO</h6><p class="store-address-text"><i class="fa-solid fa-location-dot me-1"></i> 907 Trần Hưng Đạo, Phường 1, TP.Hồ Chí Minh</p></div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="store-hover-card">
+            <img src="/image/pham-viet-chanh.jpg" class="store-hover-img" alt="Bông Trà Phạm Viết Chánh" onerror="this.src='/image/cong-hoa.jpg'">
+            <div class="store-hover-overlay"><h6 class="store-title-text">BÔNG TRÀ PHẠM VIẾT CHÁNH</h6><p class="store-address-text"><i class="fa-solid fa-location-dot me-1"></i> 100 Phạm Viết Chánh, Q.1, TP.HCM</p></div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="store-hover-card">
+            <img src="/image/bau-cat.jpg" class="store-hover-img" alt="Bông Trà Bầu Cát">
+            <div class="store-hover-overlay"><h6 class="store-title-text">BÔNG TRÀ BẦU CÁT</h6><p class="store-address-text"><i class="fa-solid fa-location-dot me-1"></i> 77-79 Bầu Cát, Tân Bình, TP.HCM</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NẠP FOOTER -->
+  <div id="footer-include"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    fetch('/header.html').then(r => r.text()).then(html => {
+      document.getElementById('header-include').innerHTML = html;
+      setTimeout(initHeaderUser, 100);
+    });
+    fetch('/footer.html').then(r => r.text()).then(html => { document.getElementById('footer-include').innerHTML = html; });
+
+    function initHeaderUser() {
+      const loggedUser = localStorage.getItem('currentUser');
+      const authArea = document.getElementById('authArea');
+      if (loggedUser && authArea) {
+        authArea.innerHTML = `
+          <div class="user-dropdown-wrapper" style="position:relative; display:flex; align-items:center; cursor:pointer;">
+            <img src="/image/icon_toi.png" alt="Tôi" style="width:32px; height:32px; border-radius:50%; object-fit:cover; border:1.5px solid #fff;" onerror="this.src='/image/logo1.png'">
+            <span style="color:#fff; font-size:13px; font-weight:700; margin-left:8px;">${loggedUser}</span>
+            <div class="user-dropdown-content" style="display:none; position:absolute; right:0; top:60px; background:#fff; min-width:180px; box-shadow:0 8px 24px rgba(0,0,0,0.18); border-radius:8px; overflow:hidden; z-index:99999;">
+              <a href="/tai-khoan" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Tài Khoản Của Tôi</a>
+              <a href="/don-mua" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Đơn Mua</a>
+              <a href="#" onclick="logoutUser(event)" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Đăng Xuất</a>
+            </div>
+          </div>
+        `;
+        const wrap = authArea.querySelector('.user-dropdown-wrapper');
+        const cont = authArea.querySelector('.user-dropdown-content');
+        wrap.addEventListener('mouseenter', () => cont.style.display = 'block');
+        wrap.addEventListener('mouseleave', () => cont.style.display = 'none');
+      }
+      updateHeaderCartButton();
+      renderProducts();
+    }
+
+    function logoutUser(e) {
+      e.preventDefault();
+      localStorage.removeItem('currentUser');
+      window.location.href = '/';
+    }
+
+    let allToppingsData = [];
+    window.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const resTop = await fetch('/api/toppings');
+        allToppingsData = await resTop.json();
+
+        let topHtml = '', avHtml = '';
+        allToppingsData.forEach(t => {
+          const itemHtml = `
+            <label class="modal-option-item">
+              <div><input type="checkbox" name="topping" value="${t.name}" data-price="${t.price}"> ${t.name}</div>
+              <span class="fw-bold small">${parseInt(t.price).toLocaleString('vi-VN')} đ</span>
+            </label>`;
+          if(t.category === 'An Vat') avHtml += itemHtml;
+          else topHtml += itemHtml;
+        });
+        document.getElementById('modalToppingContainer').innerHTML = topHtml;
+        document.getElementById('modalAnVatContainer').innerHTML = avHtml;
+
+        renderProducts();
+      } catch (e) { console.error(e); }
+    });
+
+    async function renderProducts() {
+      try {
+        const resProd = await fetch('/api/products/bestseller');
+        const products = await resProd.json();
+        let cart = JSON.parse(localStorage.getItem('cartList')) || [];
+
+        let prodHtml = '';
+        products.forEach(p => {
+          let totalQtyInCart = cart.filter(item => item.title === p.name).reduce((sum, item) => sum + item.quantity, 0);
+
+          let actionHtml = totalQtyInCart > 0 
+            ? `<div class="product-qty-badge" onclick="event.stopPropagation(); editProductInCart('${p.name}')" title="Chỉnh sửa sản phẩm">${totalQtyInCart}</div>`
+            : `<div class="btn-product-cart" onclick="event.stopPropagation(); handleProductClick('${p.name}', ${p.price}, '${p.image_url || '/image/gao-rang.png'}', '${p.description || ''}')" title="Thêm vào giỏ">
+                 <i class="fa-solid fa-cart-shopping" style="font-size: 15px;"></i>
+               </div>`;
+
+          prodHtml += `
+            <div class="product-card" onclick="handleProductClick('${p.name}', ${p.price}, '${p.image_url || '/image/gao-rang.png'}', '${p.description || ''}')">
+              <span class="badge-bestseller">Best Sellers</span>
+              <div class="product-img-box">
+                <img src="${p.image_url || '/image/gao-rang.png'}" class="product-img" alt="${p.name}">
+              </div>
+              <div>
+                <h6 class="product-title">${p.name}</h6>
+                <p class="product-desc small text-muted">${p.description || ''}</p>
+                <div class="product-price">${parseInt(p.price).toLocaleString('vi-VN')} đ</div>
+              </div>
+              <div class="product-actions-bar">${actionHtml}</div>
+            </div>`;
+        });
+        document.getElementById('bestsellerProductsContainer').innerHTML = prodHtml;
+      } catch (e) { console.error(e); }
+    }
+
+    function updateHeaderCartButton() {
+      const cartBtn = document.querySelector('.cart-icon-btn');
+      if (!cartBtn) return;
+      const cart = JSON.parse(localStorage.getItem('cartList')) || [];
+      const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+      const badge = cartBtn.querySelector('.cart-badge-count');
+      if (badge) badge.innerText = totalCount;
+
+      cartBtn.onclick = function() {
+        const loggedUser = localStorage.getItem('currentUser');
+        if (!loggedUser) alert('Vui lòng đăng nhập để xem giỏ hàng!');
+        else openCartDrawer();
+      };
+    }
+
+    function handleProductClick(title, price, img, desc) {
+      const loggedUser = localStorage.getItem('currentUser');
+      if (!loggedUser) {
+        alert('Vui lòng đăng nhập để đặt đơn.');
+        window.location.href = '/login';
+      } else {
+        openProductModal(title, price, img, desc, null, null);
+      }
+    }
+
+    function editProductInCart(title) {
+      let cart = JSON.parse(localStorage.getItem('cartList')) || [];
+      let existingItemIndex = cart.findIndex(item => item.title === title);
+      if (existingItemIndex !== -1) {
+        let item = cart[existingItemIndex];
+        openProductModal(item.title, item.price, item.img, '', item, existingItemIndex);
+      }
+    }
+
+    let currentProduct = { title: '', basePrice: 0, img: '', editingIndex: null };
+    let modalQuantity = 1;
+
+    function openProductModal(title, price, img, desc, existingItem = null, index = null) {
+      currentProduct = { title, basePrice: price, img, editingIndex: index };
+      
+      document.getElementById('modalTitle').innerText = title;
+      document.getElementById('modalBasePrice').innerText = price.toLocaleString('vi-VN') + ' đ';
+      document.getElementById('modalImg').src = img;
+      document.getElementById('modalDesc').innerText = desc || 'Hương vị thơm ngon, chất lượng tuyệt hảo từ Bông Trà.';
+
+      document.querySelectorAll('input[name="sweetness"]').forEach(r => r.checked = false);
+      document.querySelectorAll('input[name="ice"]').forEach(r => r.checked = false);
+      document.querySelectorAll('input[name="topping"]').forEach(cb => cb.checked = false);
+      document.getElementById('modalSpecialReq').value = '';
+
+      if (existingItem) {
+        modalQuantity = existingItem.quantity;
+        document.getElementById('modalQtyInput').value = modalQuantity;
+        document.getElementById('modalSpecialReq').value = existingItem.specialReq || '';
+
+        if (existingItem.sweetness) {
+          document.querySelectorAll('input[name="sweetness"]').forEach(r => {
+            if (r.value === existingItem.sweetness) r.checked = true;
+          });
+        }
+        if (existingItem.ice) {
+          document.querySelectorAll('input[name="ice"]').forEach(r => {
+            if (r.value === existingItem.ice) r.checked = true;
+          });
+        }
+        if (existingItem.toppings && existingItem.toppings.length > 0) {
+          document.querySelectorAll('input[name="topping"]').forEach(cb => {
+            if (existingItem.toppings.some(t => t.name === cb.value)) cb.checked = true;
+          });
+        }
+      } else {
+        modalQuantity = 1;
+        document.getElementById('modalQtyInput').value = 1;
+      }
+
+      document.getElementById('productModal').classList.add('active');
+      calculateModalTotal();
+    }
+
+    function closeProductModal() { document.getElementById('productModal').classList.remove('active'); }
+    
+    function checkCloseModal(e) {
+      if (e.target.id === 'productModal') {
+        closeProductModal();
+      }
+    }
+
+    function checkCloseCart(e) {
+      if (e.target.id === 'cartDrawer') {
+        toggleCartDrawer(false);
+      }
+    }
+
+    function updateModalQty(change) {
+      modalQuantity += change;
+      if (modalQuantity < 1) modalQuantity = 1;
+      document.getElementById('modalQtyInput').value = modalQuantity;
+      calculateModalTotal();
+    }
+
+    function calculateModalTotal() {
+      let total = currentProduct.basePrice;
+      document.querySelectorAll('input[name="topping"]:checked').forEach(cb => {
+        total += parseInt(cb.getAttribute('data-price') || 0);
+      });
+      total = total * modalQuantity;
+      document.getElementById('modalAddToCartBtn').innerText = `Thêm vào giỏ - ${total.toLocaleString('vi-VN')} đ`;
+    }
+
+    document.addEventListener('change', (e) => {
+      if(e.target.name === 'topping' || e.target.name === 'sweetness' || e.target.name === 'ice') {
+        calculateModalTotal();
+      }
+    });
+
+    function confirmAddToCart() {
+      const selectedSweetness = document.querySelector('input[name="sweetness"]:checked')?.value || 'Bình thường';
+      const selectedIce = document.querySelector('input[name="ice"]:checked')?.value || '50% Đá';
+      let selectedToppings = [];
+      document.querySelectorAll('input[name="topping"]:checked').forEach(cb => {
+        selectedToppings.push({ name: cb.value, price: parseInt(cb.getAttribute('data-price')) });
+      });
+      const specialReq = document.getElementById('modalSpecialReq').value;
+
+      let cart = JSON.parse(localStorage.getItem('cartList')) || [];
+
+      const newItemData = {
+        title: currentProduct.title,
+        price: currentProduct.basePrice,
+        img: currentProduct.img,
+        quantity: modalQuantity,
+        sweetness: selectedSweetness,
+        ice: selectedIce,
+        toppings: selectedToppings,
+        specialReq: specialReq
+      };
+
+      if (currentProduct.editingIndex !== null && currentProduct.editingIndex >= 0) {
+        cart[currentProduct.editingIndex] = newItemData;
+      } else {
+        cart.push(newItemData);
+      }
+
+      localStorage.setItem('cartList', JSON.stringify(cart));
+
+      closeProductModal();
+      updateHeaderCartButton();
+      renderProducts();
+      openCartDrawer();
+    }
+
+    function openCartDrawer() {
+      renderCartDrawerItems();
+      document.getElementById('cartDrawer').classList.add('active');
+    }
+    function toggleCartDrawer(isOpen) {
+      document.getElementById('cartDrawer').classList.toggle('active', isOpen);
+    }
+
+    function renderCartDrawerItems() {
+      const body = document.getElementById('cartDrawerBody');
+      const totalSpan = document.getElementById('cartDrawerTotal');
+      let cart = JSON.parse(localStorage.getItem('cartList')) || [];
+
+      if (cart.length === 0) {
+        body.innerHTML = `<p class="text-center text-muted my-5">Giỏ hàng của bạn đang trống.</p>`;
+        totalSpan.innerText = '0 đ';
+        return;
+      }
+
+      let html = `<p class="fw-bold text-success mb-3">Trà Sữa Bông Trà - Lũy Bán Bích</p>`;
+      let grandTotal = 0;
+
+      cart.forEach((item, index) => {
+        let itemPrice = item.price;
+        let toppingsText = '';
+        if (item.toppings) {
+          item.toppings.forEach(t => {
+            itemPrice += t.price;
+            toppingsText += `<br>${t.name}`;
+          });
+        }
+        let itemTotal = itemPrice * item.quantity;
+        grandTotal += itemTotal;
+
+        html += `
+          <div class="cart-item-row">
+            <img src="${item.img}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;">
+            <div style="flex-grow: 1; padding: 0 10px;">
+              <h6 class="fw-bold mb-1" style="font-size: 13px;">${item.title}</h6>
+              <small class="text-muted" style="font-size: 11px;">${item.sweetness}, ${item.ice}${toppingsText}</small>
+              <div class="d-flex align-items-center gap-2 mt-2">
+                <button class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="changeCartQty(${index}, -1)">-</button>
+                <span style="font-size: 13px; font-weight: 600;">${item.quantity}</span>
+                <button class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="changeCartQty(${index}, 1)">+</button>
+              </div>
+            </div>
+            <div class="text-end">
+              <span class="fw-bold text-dark" style="font-size: 13.5px;">${itemTotal.toLocaleString('vi-VN')} đ</span>
+              <br><a href="#" onclick="removeCartItem(${index}); return false;" class="text-danger" style="font-size: 11px;">Xóa</a>
+            </div>
+          </div>`;
+      });
+
+      body.innerHTML = html;
+      totalSpan.innerText = grandTotal.toLocaleString('vi-VN') + ' đ';
+    }
+
+    function changeCartQty(index, change) {
+      let cart = JSON.parse(localStorage.getItem('cartList')) || [];
+      cart[index].quantity += change;
+      if (cart[index].quantity <= 0) cart.splice(index, 1);
+      localStorage.setItem('cartList', JSON.stringify(cart));
+      renderCartDrawerItems();
+      updateHeaderCartButton();
+      renderProducts();
+    }
+
+    function removeCartItem(index) {
+      let cart = JSON.parse(localStorage.getItem('cartList')) || [];
+      cart.splice(index, 1);
+      localStorage.setItem('cartList', JSON.stringify(cart));
+      renderCartDrawerItems();
+      updateHeaderCartButton();
+      renderProducts();
+    }
+
+    function goToCheckout(e) {
+      e.preventDefault();
+      window.location.href = '/thanh-toan';
+    }
+  </script>
+</body>
+</html>

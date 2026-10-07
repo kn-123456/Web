@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đơn Mua - Bông Trà</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root { --main-green: #006030; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #fbf9f5 url('https://www.transparenttextures.com/patterns/paper.png');
+      color: #333;
+      padding-top: 90px;
+    }
+    .order-page-container {
+      max-width: 850px;
+      margin: 30px auto 60px;
+    }
+    .section-title {
+      color: var(--main-green);
+      font-weight: 800;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      font-size: 24px;
+      text-align: center;
+    }
+    /* Thanh Tab lọc trạng thái đơn hàng */
+    .order-tabs-wrapper {
+      display: flex;
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 6px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+      border: 1px solid #eaeaea;
+      margin-bottom: 25px;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+    .order-tab-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #666;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    .order-tab-btn.active {
+      background-color: var(--main-green);
+      color: #ffffff;
+      box-shadow: 0 4px 10px rgba(0,96,48,0.2);
+    }
+    /* Thẻ đơn hàng */
+    .order-item-card {
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      border: 1px solid #eaeaea;
+      cursor: pointer;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .order-item-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--main-green);
+    }
+    .order-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #f0f0f0;
+      padding-bottom: 12px;
+      margin-bottom: 15px;
+      font-size: 13px;
+    }
+    .status-badge {
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+    .status-cho-xac-nhan { background: #fff8e1; color: #f57f17; }
+    .status-dang-giao { background: #e8f5ed; color: var(--main-green); }
+    .status-da-giao { background: #e3f2fd; color: #1565c0; }
+    .status-danh-gia { background: #fce4ec; color: #c2185b; }
+    .status-da-huy { background: #ffebee; color: #c62828; }
+  </style>
+</head>
+<body>
+
+  <div id="header-include"></div>
+
+  <div class="container order-page-container">
+    <h2 class="section-title">Đơn Mua Của Bạn</h2>
+    
+    <!-- CÁC TAB LỌC TRẠNG THÁI ĐƠN HÀNG -->
+    <div class="order-tabs-wrapper">
+      <button class="order-tab-btn active" onclick="filterOrders('all', this)">Tất cả</button>
+      <button class="order-tab-btn" onclick="filterOrders('Chờ xác nhận', this)">Chờ xác nhận</button>
+      <button class="order-tab-btn" onclick="filterOrders('Đang giao hàng', this)">Đang giao hàng</button>
+      <button class="order-tab-btn" onclick="filterOrders('Đã giao hàng', this)">Đã giao hàng</button>
+      <button class="order-tab-btn" onclick="filterOrders('Đánh giá', this)">Đánh giá</button>
+      <button class="order-tab-btn" onclick="filterOrders('Đã hủy', this)">Đã hủy</button>
+    </div>
+
+    <!-- DANH SÁCH ĐƠN HÀNG -->
+    <div id="orderListContainer">
+      <!-- Dữ liệu sẽ được render tự động bằng Javascript -->
+    </div>
+  </div>
+
+  <!-- MODAL XEM CHI TIẾT ĐƠN HÀNG (GIỐNG ẢNH MẪU) -->
+  <div class="modal fade" id="orderDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+        <div class="modal-header bg-success text-white py-3">
+          <h5 class="modal-title fw-bold fs-6"><i class="fa-solid fa-file-invoice me-2"></i>Chi Tiết Đơn Hàng</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4 bg-light" id="modalOrderDetailContent">
+          <!-- Nội dung chi tiết đơn hàng -->
+        </div>
+        <div class="modal-footer bg-white py-2">
+          <button type="button" class="btn btn-secondary btn-sm px-4 fw-bold" data-bs-dismiss="modal">Đóng</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="footer-include"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function initHeaderUser() {
+      const loggedUser = localStorage.getItem('currentUser');
+      const authArea = document.getElementById('authArea');
+      if (loggedUser && authArea) {
+        authArea.innerHTML = `
+          <div class="user-dropdown-wrapper" style="position:relative; display:flex; align-items:center; cursor:pointer; height:60px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <img src="/image/icon_toi.png" alt="Tôi" style="width:30px; height:30px; border-radius:50%; object-fit:cover; border:1.5px solid #fff;" onerror="this.src='/image/logo1.png'">
+              <span style="color:#fff; font-size:12px; font-weight:800; text-transform:uppercase;">${loggedUser}</span>
+            </div>
+            <div class="user-dropdown-content" style="display:none; position:absolute; right:0; top:60px; background:#fff; min-width:180px; box-shadow:0 8px 24px rgba(0,0,0,0.18); border-radius:8px; overflow:hidden; z-index:99999; border:1px solid #eaeaea;">
+              <a href="/tai-khoan" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Tài Khoản Của Tôi</a>
+              <a href="/don-mua" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Đơn Mua</a>
+              <a href="#" onclick="localStorage.removeItem('currentUser'); window.location.href='/'; return false;" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Đăng Xuất</a>
+            </div>
+          </div>
+        `;
+        const wrap = authArea.querySelector('.user-dropdown-wrapper');
+        const cont = authArea.querySelector('.user-dropdown-content');
+        if(wrap && cont) {
+          wrap.addEventListener('mouseenter', () => cont.style.display = 'block');
+          wrap.addEventListener('mouseleave', () => cont.style.display = 'none');
+        }
+      }
+      const cartBtn = document.querySelector('.cart-icon-btn');
+      if (cartBtn) {
+        const cart = JSON.parse(localStorage.getItem('cartList')) || [];
+        const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+        const badge = cartBtn.querySelector('.cart-badge-count');
+        if (badge) badge.innerText = totalCount;
+        cartBtn.onclick = function() {
+          if (!loggedUser) { alert('Vui lòng đăng nhập!'); window.location.href = '/login'; }
+          else { window.location.href = '/menu'; }
+        };
+      }
+    }
+
+    fetch('/header.html').then(r => r.text()).then(html => { document.getElementById('header-include').innerHTML = html; initHeaderUser(); });
+    fetch('/footer.html').then(r => r.text()).then(html => { document.getElementById('footer-include').innerHTML = html; });
+
+    // Dữ liệu mẫu đơn hàng (nếu chưa có trong localStorage)
+    let sampleOrders = [
+      {
+        id: 'BT82910',
+        code: 'A-9RXHVK9W33UAAV',
+        date: '08:21, 13 Thg 9 2026',
+        status: 'Đang giao hàng',
+        storeName: 'Bông Trà Lũy Bán Bích',
+        address: '389 Lũy Bán Bích, Phường Phú Thạnh, Tân Phú',
+        items: [
+          { name: 'Trà Sữa Ô Long Hoa Nhài (Size M, Ít đá)', price: 45000, qty: 1, note: 'Ít đường, thêm trân châu trắng' }
+        ],
+        shippingFee: 15000,
+        discount: 10000,
+        pointsEarned: 12
+      },
+      {
+        id: 'BT71242',
+        code: 'B-7YHN82K11BBCC',
+        date: '14:10, 01 Thg 8 2026',
+        status: 'Đã giao hàng',
+        storeName: 'Bông Trà Phạm Viết Chánh',
+        address: '100 Phạm Viết Chánh, Quận 1',
+        items: [
+          { name: 'Hồng Trà Sữa Trân Châu Hoàng Gia', price: 38000, qty: 2, note: 'Bình thường' }
+        ],
+        shippingFee: 20000,
+        discount: 15000,
+        pointsEarned: 15
+      }
+    ];
+
+    let currentFilter = 'all';
+
+    function renderOrders(filter = 'all') {
+      let orders = JSON.parse(localStorage.getItem('bongtra_orders')) || sampleOrders;
+      if (!localStorage.getItem('bongtra_orders')) {
+        localStorage.setItem('bongtra_orders', JSON.stringify(sampleOrders));
+      }
+
+      const container = document.getElementById('orderListContainer');
+      
+      let filtered = orders;
+      if (filter !== 'all') {
+        filtered = orders.filter(o => o.status === filter);
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-5 bg-white rounded-4 border border-light shadow-sm">
+            <i class="fa-solid fa-box-open text-muted mb-3" style="font-size: 48px;"></i>
+            <h6 class="fw-bold text-dark">Không có đơn hàng nào ở trạng thái này</h6>
+            <p class="text-muted small">Hãy ghé thăm Menu để chọn cho mình ly trà thơm ngon nhé!</p>
+            <a href="/menu" class="btn btn-sm btn-success fw-bold px-4 mt-2">Xem Menu ngay</a>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map(o => {
+        let badgeClass = 'status-dang-giao';
+        if (o.status === 'Chờ xác nhận') badgeClass = 'status-cho-xac-nhan';
+        else if (o.status === 'Đã giao hàng') badgeClass = 'status-da-giao';
+        else if (o.status === 'Đánh giá') badgeClass = 'status-danh-gia';
+        else if (o.status === 'Đã hủy') badgeClass = 'status-da-huy';
+
+        let firstItem = o.items[0];
+        let subTotal = o.items.reduce((s, item) => s + (item.price * item.qty), 0);
+        let grandTotal = subTotal + (o.shippingFee || 0) - (o.discount || 0);
+
+        return `
+          <div class="order-item-card" onclick='openOrderDetail(${JSON.stringify(o)})'>
+            <div class="order-header-row">
+              <span class="fw-bold text-dark"><i class="fa-solid fa-hashtag text-success"></i> ${o.id} · <span class="text-muted fw-normal">${o.date}</span></span>
+              <span class="status-badge ${badgeClass}">${o.status}</span>
+            </div>
+            <div class="d-flex align-items-center justify-content-between">
+              <div class="d-flex align-items-center gap-3">
+                <img src="/image/logo1.png" alt="Logo" style="width: 50px; height: 50px; object-fit: contain; background: #f8f9fa; border-radius: 8px; padding: 5px;">
+                <div>
+                  <h6 class="fw-bold mb-1" style="font-size: 14px; color: #222;">${firstItem.name} ${o.items.length > 1 ? `và ${o.items.length - 1} sản phẩm khác` : ''}</h6>
+                  <p class="text-muted mb-0" style="font-size: 12px;">Cửa hàng: <strong class="text-dark">${o.storeName || 'Bông Trà'}</strong></p>
+                </div>
+              </div>
+              <div class="text-end">
+                <div class="text-success fw-bold" style="font-size: 15px;">${grandTotal.toLocaleString()}đ</div>
+                <span class="text-muted" style="font-size: 11px;">Nhấn để xem chi tiết ></span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function filterOrders(status, btn) {
+      currentFilter = status;
+      document.querySelectorAll('.order-tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderOrders(status);
+    }
+
+    // Hiển thị Modal Chi tiết đơn hàng giống như ảnh mẫu
+    function openOrderDetail(order) {
+      let subTotal = order.items.reduce((s, item) => s + (item.price * item.qty), 0);
+      let ship = order.shippingFee || 15000;
+      let disc = order.discount || 0;
+      let grandTotal = subTotal + ship - disc;
+      let points = order.pointsEarned || 10;
+
+      let itemsHtml = order.items.map(item => `
+        <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+          <div>
+            <h6 class="fw-bold mb-1 text-dark" style="font-size: 13.5px;">🔥 ${item.name}</h6>
+            <p class="text-muted mb-0" style="font-size: 11.5px;">${item.note || 'Không có ghi chú'}</p>
+          </div>
+          <div class="text-end">
+            <span class="fw-bold text-dark" style="font-size: 13.5px;">${(item.price * item.qty).toLocaleString()}đ</span>
+            <span class="text-muted small d-block" style="font-size: 11px;">${item.qty}x</span>
+          </div>
+        </div>
+      `).join('');
+
+      let modalContent = `
+        <div class="bg-white p-3 rounded-3 shadow-sm mb-3">
+          <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style="font-size: 12px;">
+            <span class="text-muted fw-bold">MÃ ĐẶT HÀNG</span>
+            <span class="fw-bold text-success font-monospace">${order.code || 'BT-99281'}</span>
+          </div>
+          <div class="d-flex align-items-start gap-2 mb-2" style="font-size: 12.5px;">
+            <i class="fa-solid fa-location-dot text-primary mt-1"></i>
+            <div>
+              <strong class="text-dark">${order.storeName}</strong>
+              <div class="text-muted" style="font-size: 11.5px;">${order.address}</div>
+            </div>
+          </div>
+          <div class="d-flex align-items-start gap-2" style="font-size: 12.5px;">
+            <i class="fa-solid fa-map-pin text-danger mt-1"></i>
+            <div>
+              <strong class="text-dark">Địa chỉ nhận hàng của bạn</strong>
+              <div class="text-muted" style="font-size: 11.5px;">389 Lũy Bán Bích, Phường Phú Thạnh, Tân Phú, TP.HCM</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white p-3 rounded-3 shadow-sm mb-3">
+          <div class="fw-bold text-dark mb-2" style="font-size: 13px;">Tóm tắt đơn hàng</div>
+          ${itemsHtml}
+
+          <div class="mt-3 pt-2 border-top" style="font-size: 12.5px;">
+            <div class="d-flex justify-content-between mb-1 text-muted">
+              <span>Tổng tạm tính</span>
+              <span>${subTotal.toLocaleString()}đ</span>
+            </div>
+            <div class="d-flex justify-content-between mb-1 text-muted">
+              <span>Phí áp dụng (Vận chuyển)</span>
+              <span>${ship.toLocaleString()}đ</span>
+            </div>
+            ${disc > 0 ? `
+              <div class="d-flex justify-content-between mb-1 text-success">
+                <span>Giảm giá khuyến mãi</span>
+                <span>-${disc.toLocaleString()}đ</span>
+              </div>
+            ` : ''}
+            <div class="d-flex justify-content-between mt-2 pt-2 border-top fw-bold text-dark" style="font-size: 14.5px;">
+              <span>Tổng cộng thanh toán</span>
+              <span class="text-success">${grandTotal.toLocaleString()}đ</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-success bg-opacity-10 p-3 rounded-3 text-success fw-bold d-flex align-items-center justify-content-between" style="font-size: 13px;">
+          <span><i class="fa-solid fa-coins me-2"></i>Bạn đã tích lũy được ${points} Bông Điểm từ đơn hàng này!</span>
+          <span class="badge bg-success text-white">+${points} Điểm</span>
+        </div>
+      `;
+
+      document.getElementById('modalOrderDetailContent').innerHTML = modalContent;
+      new bootstrap.Modal(document.getElementById('orderDetailModal')).show();
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      renderOrders('all');
+    });
+  </script>
+</body>
+</html>
