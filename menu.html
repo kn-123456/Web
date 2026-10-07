@@ -232,7 +232,7 @@
     }
     .product-qty-badge:hover { transform: scale(1.1); background: #e8f5e9; }
 
-    /* MODAL THÔNG TIN SẢN PHẨM - KHẮC PHỤC TRIỆT ĐỂ LỖI ĐÈ CHỮ */
+    /* MODAL THÔNG TIN SẢN PHẨM - LÀM DÀI VÀ THOÁNG HƠN */
     .product-modal-overlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6);
       z-index: 99999; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: 0.3s;
@@ -240,24 +240,23 @@
     .product-modal-overlay.active { opacity: 1; visibility: visible; }
     
     .product-modal-container {
-      background: #fff; width: 100%; max-width: 680px; border-radius: 8px;
-      overflow: hidden; position: relative; box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+      background: #fff; width: 100%; max-width: 720px; border-radius: 12px;
+      overflow: hidden; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.3);
       transform: translateY(20px); transition: transform 0.3s ease;
-      max-height: 90vh; display: flex; flex-direction: column;
+      max-height: 92vh; display: flex; flex-direction: column;
     }
     .product-modal-overlay.active .product-modal-container { transform: translateY(0); }
 
     .modal-top-bar {
-      display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid #eaeaea; flex-shrink: 0;
+      display: flex; justify-content: space-between; align-items: center; padding: 18px 25px; border-bottom: 1px solid #eaeaea; flex-shrink: 0;
     }
-    .modal-top-bar h5 { font-size: 18px; font-weight: 600; color: #222; margin: 0; }
+    .modal-top-bar h5 { font-size: 18px; font-weight: 700; color: #222; margin: 0; }
     .modal-close-x { background: none; border: none; font-size: 20px; color: #666; cursor: pointer; }
 
     .modal-body-content {
       display: flex; padding: 25px; gap: 25px; align-items: center; flex-shrink: 0;
     }
     
-    /* CỐ ĐỊNH KÍCH THƯỚC KHUNG ẢNH ĐỂ KHÔNG BỊ TRÀN */
     .modal-img-wrapper {
       background: #f7f7f7; border-radius: 8px; width: 260px; min-width: 260px; height: 220px; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; position: relative; z-index: 2;
     }
@@ -268,14 +267,21 @@
     .modal-price-tag { font-size: 20px; font-weight: 700; color: #008040; margin: 8px 0; }
     .modal-desc-text { font-size: 13px; color: #666; line-height: 1.5; margin-bottom: 0; }
 
-    .modal-options-section { padding: 0 25px 10px; border-top: 1px solid #f0f0f0; margin-top: 5px; padding-top: 10px; overflow-y: auto; max-height: 160px; flex-shrink: 1; }
-    .modal-option-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 13px; cursor: pointer; border-bottom: 1px solid #f8f8f8; }
+    .modal-options-section { 
+      padding: 15px 25px; 
+      border-top: 1px solid #f0f0f0; 
+      margin-top: 5px; 
+      overflow-y: auto; 
+      max-height: 280px; /* Làm vùng chọn topping dài và rộng hơn, dễ nhìn */
+      flex-shrink: 1; 
+    }
+    .modal-option-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; font-size: 13.5px; cursor: pointer; border-bottom: 1px solid #f8f8f8; }
 
     .modal-footer-action {
-      padding: 15px 25px; background: #fafafa; border-top: 1px solid #eaeaea; display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-shrink: 0;
+      padding: 18px 25px; background: #fafafa; border-top: 1px solid #eaeaea; display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-shrink: 0;
     }
     .btn-add-to-cart-modal {
-      flex-grow: 1; background: #008040; color: #fff; border: none; border-radius: 6px; padding: 12px; font-weight: 700; font-size: 15px; cursor: pointer; transition: 0.2s;
+      flex-grow: 1; background: #008040; color: #fff; border: none; border-radius: 8px; padding: 12px; font-weight: 700; font-size: 15px; cursor: pointer; transition: 0.2s;
     }
     .btn-add-to-cart-modal:hover { background: #006030; }
 
@@ -383,7 +389,7 @@
         </div>
       </div>
 
-      <!-- KHUNG TÙY CHỌN ĐỘ NGỌT, ĐÁ, TOPPING (CHỈ HIỆN VỚI THỨC UỐNG) -->
+      <!-- KHUNG TÙY CHỌN ĐỘ NGỌT, ĐÁ, TOPPING -->
       <div class="modal-options-section" id="drinkOptionsSection">
         <h6 class="fw-bold text-uppercase mb-2 text-secondary" style="font-size: 12px;">Độ Ngọt & Mức Đá</h6>
         <div class="row">
@@ -406,7 +412,7 @@
         </div>
         
         <h6 class="fw-bold text-uppercase mt-3 mb-2 text-secondary" style="font-size: 12px;">Topping Đi Kèm</h6>
-        <div id="modalToppingContainer" style="max-height: 120px; overflow-y: auto;"></div>
+        <div id="modalToppingContainer"></div>
       </div>
 
       <!-- Ô GHI CHÚ / YÊU CẦU ĐẶC BIỆT -->
@@ -667,8 +673,10 @@
       document.getElementById('modalSpecialReq').value = '';
 
       const drinkOptionsSection = document.getElementById('drinkOptionsSection');
-      // Chỉ các danh mục thức uống mới hiện bảng chọn độ ngọt, mức đá và topping đi kèm
-      const isDrink = ['Milk Tea', 'Fruit Tea', 'Iced Tea', 'Macchiato'].includes(category);
+      
+      // Tất cả sản phẩm trừ Topping và Bánh đều bật khung chọn ngọt, đá và topping đi kèm
+      const lowerCat = (category || '').toLowerCase();
+      const isDrink = !lowerCat.includes('topping') && !lowerCat.includes('bánh') && !lowerCat.includes('ăn vặt');
       
       if (isDrink) {
         drinkOptionsSection.style.display = 'block';
@@ -676,7 +684,7 @@
         document.getElementById('modalIce').value = 'Đá 100%';
         document.querySelectorAll('input[name="topping"]').forEach(cb => cb.checked = false);
       } else {
-        drinkOptionsSection.style.display = 'none'; // Ẩn hoàn toàn với Bánh Mì, Bánh Ngọt, Topping
+        drinkOptionsSection.style.display = 'none'; // Ẩn với Topping hoặc Bánh
       }
 
       if (existingItem) {
@@ -714,7 +722,8 @@
 
     function calculateModalTotal() {
       let total = currentProduct.basePrice;
-      const isDrink = ['Milk Tea', 'Fruit Tea', 'Iced Tea', 'Macchiato'].includes(currentProduct.category);
+      const lowerCat = (currentProduct.category || '').toLowerCase();
+      const isDrink = !lowerCat.includes('topping') && !lowerCat.includes('bánh') && !lowerCat.includes('ăn vặt');
       
       if (isDrink) {
         document.querySelectorAll('input[name="topping"]:checked').forEach(cb => {
@@ -732,7 +741,9 @@
     });
 
     function confirmAddToCart() {
-      const isDrink = ['Milk Tea', 'Fruit Tea', 'Iced Tea', 'Macchiato'].includes(currentProduct.category);
+      const lowerCat = (currentProduct.category || '').toLowerCase();
+      const isDrink = !lowerCat.includes('topping') && !lowerCat.includes('bánh') && !lowerCat.includes('ăn vặt');
+      
       const selectedSweetness = isDrink ? document.getElementById('modalSweetness').value : null;
       const selectedIce = isDrink ? document.getElementById('modalIce').value : null;
       let selectedToppings = [];
