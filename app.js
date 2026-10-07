@@ -6,9 +6,19 @@ const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const path = require('path');
+const https = require('https');
+const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const HTTPS_PORT = process.env.HTTPS_PORT || 8443;
+
+// Cấu hình SSL/TLS 1.3 Options
+const options = {
+    key: fs.readFileSync('server.key'),
+    cert: fs.readFileSync('server.crt'),
+    minVersion: 'TLSv1.3' // Ép buộc sử dụng TLS 1.3
+};
 
 // Middleware
 app.use(cors());
@@ -62,6 +72,9 @@ app.get('/register', (req, res) => res.sendFile(path.join(__dirname, 'register.h
 app.get('/tin-tuc-chi-tiet', (req, res) => res.sendFile(path.join(__dirname, 'tin-tuc-chi-tiet.html')));
 app.get('/header.html', (req, res) => res.sendFile(path.join(__dirname, 'header.html')));
 app.get('/footer.html', (req, res) => res.sendFile(path.join(__dirname, 'footer.html')));
+app.get('/thanh-toan', (req, res) => res.sendFile(path.join(__dirname, 'thanh-toan.html')));
+app.get('/tai-khoan', (req, res) => res.sendFile(path.join(__dirname, 'tai-khoan.html')));
+app.get('/don-mua', (req, res) => res.sendFile(path.join(__dirname, 'don-mua.html')));
 
 // 5. REST APIs DỮ LIỆU
 app.get('/api/products/bestseller', async (req, res) => {
@@ -128,6 +141,15 @@ app.get('/api/about', async (req, res) => {
     }
 });
 
+app.get('/api/toppings', async (req, res) => {
+    try {
+        const [rows] = await db.query(`SELECT * FROM toppings`);
+        res.json(rows);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // 6. API TIẾP NHẬN FORM LIÊN HỆ VÀ GỬI MAIL CSKH
 app.post('/api/contact', async (req, res) => {
     const { fullname, email, phone, is_store_feedback, message } = req.body;
@@ -165,7 +187,7 @@ app.post('/api/contact', async (req, res) => {
             };
             await transporter.sendMail(mailOptions);
         } catch (mailError) {
-            console.error('⚠️️ Lỗi gửi Email:', mailError.message);
+            console.error('⚠ Lỗi gửi Email:', mailError.message);
         }
 
         return res.json({
@@ -204,7 +226,7 @@ function decryptAES(encryptedData, ivHex, authTagHex) {
     }
 }
 
-// 8. API ĐĂNG KÝ (Nhận fullname, phone, username, password)
+// 8. API ĐĂNG KÝ
 app.post('/api/register', async (req, res) => {
     const { fullname, phone, username, password, sensitiveData, role } = req.body;
     try {
@@ -263,24 +285,9 @@ app.post('/api/secure-login', async (req, res) => {
     }
 });
 
-// API lấy danh sách topping và ăn vặt từ database
-app.get('/api/toppings', async (req, res) => {
-    try {
-        const [rows] = await db.query(`SELECT * FROM toppings`);
-        res.json(rows);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
-app.get('/thanh-toan', (req, res) => res.sendFile(path.join(__dirname, 'thanh-toan.html')));
-
-// KHỞI CHẠY SERVER
-app.listen(PORT, () => {
+// KHỞI CHẠY HTTPS SERVER (TLS 1.3)
+https.createServer(options, app).listen(HTTPS_PORT, () => {
     console.log(`================================================`);
-    console.log(`🚀 Server Bông Trà đang chạy tại: http://localhost:${PORT}`);
+    console.log(`🚀 Secure Server (TLS 1.3) đang chạy tại: https://localhost:${HTTPS_PORT}`);
     console.log(`================================================`);
 });
-
-app.get('/tai-khoan', (req, res) => res.sendFile(path.join(__dirname, 'tai-khoan.html')));
-app.get('/don-mua', (req, res) => res.sendFile(path.join(__dirname, 'don-mua.html')));
