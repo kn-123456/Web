@@ -94,7 +94,6 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    // Tự động nạp Header và kích hoạt hàm xử lý chung
     fetch('/header.html')
       .then(r => r.text())
       .then(html => { 
@@ -147,7 +146,12 @@
         
         if (res.ok) {
           usernameErrorMsg.style.display = 'none';
+          
+          // Ghi nhận tài khoản hiện tại và khởi tạo giỏ hàng riêng nếu chưa tồn tại
           localStorage.setItem('currentUser', username);
+          if (!localStorage.getItem(`cartList_${username}`)) {
+            localStorage.setItem(`cartList_${username}`, JSON.stringify([]));
+          }
 
           document.getElementById('toastNameTitle').innerText = `Chào mừng ${fullname} (${username})!`;
           document.getElementById('welcomeToast').classList.add('show');

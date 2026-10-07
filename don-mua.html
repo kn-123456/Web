@@ -116,7 +116,7 @@
     </div>
   </div>
 
-  <!-- MODAL XEM CHI TIẾT ĐƠN HÀNG (GIỐNG ẢNH MẪU) -->
+  <!-- MODAL XEM CHI TIẾT ĐƠN HÀNG -->
   <div class="modal fade" id="orderDetailModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
@@ -138,20 +138,35 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
+    function logoutUser(e) {
+      if (e) e.preventDefault();
+      // CHỈ XÓA PHIÊN ĐĂNG NHẬP, GIỮ NGUYÊN GIỎ HÀNG RIÊNG CỦA TỪNG USER
+      localStorage.removeItem('currentUser');
+      localStorage.removeItem('isVipMember');
+      window.location.href = '/';
+    }
+
     function initHeaderUser() {
       const loggedUser = localStorage.getItem('currentUser');
+      const isVip = localStorage.getItem('isVipMember') === 'true';
       const authArea = document.getElementById('authArea');
+      
+      let displayName = loggedUser || '';
+      if (isVip && displayName && !displayName.includes('👑')) {
+        displayName += ' 👑';
+      }
+
       if (loggedUser && authArea) {
         authArea.innerHTML = `
           <div class="user-dropdown-wrapper" style="position:relative; display:flex; align-items:center; cursor:pointer; height:60px;">
             <div style="display:flex; align-items:center; gap:8px;">
               <img src="/image/icon_toi.png" alt="Tôi" style="width:30px; height:30px; border-radius:50%; object-fit:cover; border:1.5px solid #fff;" onerror="this.src='/image/logo1.png'">
-              <span style="color:#fff; font-size:12px; font-weight:800; text-transform:uppercase;">${loggedUser}</span>
+              <span style="color:#fff; font-size:12px; font-weight:800; text-transform:uppercase;">${displayName}</span>
             </div>
             <div class="user-dropdown-content" style="display:none; position:absolute; right:0; top:60px; background:#fff; min-width:180px; box-shadow:0 8px 24px rgba(0,0,0,0.18); border-radius:8px; overflow:hidden; z-index:99999; border:1px solid #eaeaea;">
               <a href="/tai-khoan" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Tài Khoản Của Tôi</a>
               <a href="/don-mua" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Đơn Mua</a>
-              <a href="#" onclick="localStorage.removeItem('currentUser'); window.location.href='/'; return false;" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Đăng Xuất</a>
+              <a href="#" onclick="logoutUser(event)" style="color:#dc3545; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Đăng Xuất</a>
             </div>
           </div>
         `;
@@ -161,13 +176,20 @@
           wrap.addEventListener('mouseenter', () => cont.style.display = 'block');
           wrap.addEventListener('mouseleave', () => cont.style.display = 'none');
         }
+      } else if (authArea) {
+        authArea.innerHTML = `<a href="/login" class="btn-header-login">ĐĂNG NHẬP</a>`;
       }
+
       const cartBtn = document.querySelector('.cart-icon-btn');
       if (cartBtn) {
-        const cart = JSON.parse(localStorage.getItem('cartList')) || [];
-        const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
         const badge = cartBtn.querySelector('.cart-badge-count');
-        if (badge) badge.innerText = totalCount;
+        if (!loggedUser) {
+          if (badge) { badge.style.display = 'inline-block'; badge.innerText = '0'; }
+        } else {
+          const cart = JSON.parse(localStorage.getItem(`cartList_${loggedUser}`)) || [];
+          const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+          if (badge) { badge.style.display = 'inline-block'; badge.innerText = totalCount; }
+        }
         cartBtn.onclick = function() {
           if (!loggedUser) { alert('Vui lòng đăng nhập!'); window.location.href = '/login'; }
           else { window.location.href = '/menu'; }
@@ -178,7 +200,6 @@
     fetch('/header.html').then(r => r.text()).then(html => { document.getElementById('header-include').innerHTML = html; initHeaderUser(); });
     fetch('/footer.html').then(r => r.text()).then(html => { document.getElementById('footer-include').innerHTML = html; });
 
-    // Dữ liệu mẫu đơn hàng (nếu chưa có trong localStorage)
     let sampleOrders = [
       {
         id: 'BT82910',
@@ -256,7 +277,7 @@
             </div>
             <div class="d-flex align-items-center justify-content-between">
               <div class="d-flex align-items-center gap-3">
-                <img src="/image/logo1.png" alt="Logo" style="width: 50px; height: 50px; object-fit: contain; background: #f8f9fa; border-radius: 8px; padding: 5px;">
+                <img src="/image/logo1.png" alt="Logo" style="width: 50px; height: 50px; object-fit: contain; background: #f8f9fa; border-radius: 8px; padding: 5px;" onerror="this.src='/image/logo1.png'">
                 <div>
                   <h6 class="fw-bold mb-1" style="font-size: 14px; color: #222;">${firstItem.name} ${o.items.length > 1 ? `và ${o.items.length - 1} sản phẩm khác` : ''}</h6>
                   <p class="text-muted mb-0" style="font-size: 12px;">Cửa hàng: <strong class="text-dark">${o.storeName || 'Bông Trà'}</strong></p>
@@ -279,7 +300,6 @@
       renderOrders(status);
     }
 
-    // Hiển thị Modal Chi tiết đơn hàng giống như ảnh mẫu
     function openOrderDetail(order) {
       let subTotal = order.items.reduce((s, item) => s + (item.price * item.qty), 0);
       let ship = order.shippingFee || 15000;

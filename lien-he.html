@@ -110,12 +110,35 @@
       background-color: #004d25;
       color: #fff;
     }
+
+    /* TOAST THÔNG BÁO XINH XẮN */
+    .custom-toast-container {
+      position: fixed; bottom: 30px; right: 30px; z-index: 99999;
+    }
+    .custom-toast {
+      background: #ffffff; border-left: 4px solid var(--main-green);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15); border-radius: 10px;
+      padding: 14px 20px; display: flex; align-items: center; gap: 12px;
+      min-width: 300px; transform: translateY(100px); opacity: 0;
+      transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    }
+    .custom-toast.show { transform: translateY(0); opacity: 1; }
+    .custom-toast i { color: var(--main-green); font-size: 20px; }
+    .custom-toast-text { font-size: 13.5px; font-weight: 600; color: #333; margin: 0; }
   </style>
 </head>
 <body>
 
   <!-- NẠP HEADER CHUNG -->
   <div id="header-include"></div>
+
+  <!-- KHUNG TOAST THÔNG BÁO XINH XẮN -->
+  <div class="custom-toast-container">
+    <div class="custom-toast" id="customToast">
+      <i class="fa-solid fa-circle-check"></i>
+      <p class="custom-toast-text" id="toastMessage">Thông báo thành công!</p>
+    </div>
+  </div>
 
   <!-- SECTION LIÊN HỆ -->
   <section class="paper-section">
@@ -171,26 +194,26 @@
           <div class="contact-card">
             <h4 style="color: var(--main-green); font-weight: 800; font-size: 18px; margin-bottom: 25px;">GỬI TIN NHẮN CHO CHÚNG TÔI</h4>
             
-            <form onsubmit="handleContactSubmit(event)">
+            <form id="contactForm">
               <div class="row g-3">
                 <div class="col-md-6">
                   <label class="form-label" style="font-size: 13px; font-weight: 600;">Họ và tên</label>
-                  <input type="text" class="form-control" placeholder="Nhập họ tên của bạn" required>
+                  <input type="text" id="fullname" class="form-control" placeholder="Nhập họ tên của bạn" required>
                 </div>
                 <div class="col-md-6">
                   <label class="form-label" style="font-size: 13px; font-weight: 600;">Số điện thoại</label>
-                  <input type="tel" class="form-control" placeholder="Nhập số điện thoại" required>
+                  <input type="tel" id="phone" class="form-control" placeholder="Nhập số điện thoại" required>
                 </div>
                 <div class="col-12">
                   <label class="form-label" style="font-size: 13px; font-weight: 600;">Email</label>
-                  <input type="email" class="form-control" placeholder="Nhập địa chỉ email của bạn">
+                  <input type="email" id="email" class="form-control" placeholder="Nhập địa chỉ email của bạn">
                 </div>
                 <div class="col-12">
                   <label class="form-label" style="font-size: 13px; font-weight: 600;">Nội dung cần hỗ trợ</label>
-                  <textarea class="form-control" rows="4" placeholder="Nhập nội dung bạn muốn gửi đến Bông Trà..." required></textarea>
+                  <textarea id="message" class="form-control" rows="4" placeholder="Nhập nội dung bạn muốn gửi đến Bông Trà..." required></textarea>
                 </div>
                 <div class="col-12 mt-4">
-                  <button type="submit" class="btn-submit-contact">Gửi thông tin</button>
+                  <button type="submit" id="submitBtn" class="btn-submit-contact">Gửi thông tin</button>
                 </div>
               </div>
             </form>
@@ -207,9 +230,19 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
+  function showNotification(msg) {
+    const toast = document.getElementById('customToast');
+    document.getElementById('toastMessage').innerText = msg;
+    toast.classList.add('show');
+    setTimeout(() => {
+      toast.classList.remove('show');
+    }, 3000);
+  }
+
   function initHeaderUser() {
     const loggedUser = localStorage.getItem('currentUser');
     const authArea = document.getElementById('authArea');
+    
     if (loggedUser && authArea) {
       authArea.innerHTML = `
         <div class="user-dropdown-wrapper" style="position:relative; display:flex; align-items:center; cursor:pointer; height:60px;">
@@ -220,7 +253,7 @@
           <div class="user-dropdown-content" style="display:none; position:absolute; right:0; top:60px; background:#fff; min-width:180px; box-shadow:0 8px 24px rgba(0,0,0,0.18); border-radius:8px; overflow:hidden; z-index:99999; border:1px solid #eaeaea;">
             <a href="/tai-khoan" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Tài Khoản Của Tôi</a>
             <a href="/don-mua" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Đơn Mua</a>
-            <a href="#" onclick="localStorage.removeItem('currentUser'); window.location.href='/'; return false;" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Đăng Xuất</a>
+            <a href="#" onclick="logoutUser(event)" style="color:#dc3545; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Đăng Xuất</a>
           </div>
         </div>
       `;
@@ -230,17 +263,32 @@
         wrap.addEventListener('mouseenter', () => cont.style.display = 'block');
         wrap.addEventListener('mouseleave', () => cont.style.display = 'none');
       }
+    } else if (authArea) {
+      authArea.innerHTML = `<a href="/login" class="btn-header-login">ĐĂNG NHẬP</a>`;
     }
+
     const cartBtn = document.querySelector('.cart-icon-btn');
     if (cartBtn) {
-      const cart = JSON.parse(localStorage.getItem('cartList')) || [];
-      const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
       const badge = cartBtn.querySelector('.cart-badge-count');
-      if (badge) badge.innerText = totalCount;
+      
+      if (!loggedUser) {
+        if (badge) {
+          badge.style.display = 'inline-block';
+          badge.innerText = '0';
+        }
+      } else {
+        const cart = JSON.parse(localStorage.getItem(`cartList_${loggedUser}`)) || [];
+        const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+        if (badge) {
+          badge.style.display = 'inline-block';
+          badge.innerText = totalCount;
+        }
+      }
+
       cartBtn.onclick = function() {
         if (!loggedUser) {
-          alert('Vui lòng đăng nhập để xem giỏ hàng!');
-          window.location.href = '/login';
+          showNotification('Vui lòng đăng nhập để xem giỏ hàng!');
+          setTimeout(() => { window.location.href = '/login'; }, 1000);
         } else {
           window.location.href = '/menu';
         }
@@ -248,31 +296,19 @@
     }
   }
 
+  function logoutUser(e) {
+    if (e) e.preventDefault();
+    // CHỈ XÓA PHIÊN ĐĂNG NHẬP, GIỮ NGUYÊN GIỎ HÀNG CỦA TỪNG USER
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('isVipMember');
+    window.location.href = '/';
+  }
+
   fetch('/header.html').then(r => r.text()).then(html => { 
     document.getElementById('header-include').innerHTML = html;
     initHeaderUser();
   });
   fetch('/footer.html').then(r => r.text()).then(html => { document.getElementById('footer-include').innerHTML = html; });
-
-  function showToast(title, message, isError = false) {
-    const toast = document.getElementById('toastNotification');
-    const toastTitle = document.getElementById('toastTitle');
-    const toastMessage = document.getElementById('toastMessage');
-    const toastIcon = document.getElementById('toastIcon');
-
-    toastTitle.innerText = title;
-    toastMessage.innerText = message;
-
-    if (isError) {
-      toast.classList.add('error');
-      toastIcon.innerHTML = '<i class="fa-solid fa-xmark"></i>';
-    } else {
-      toast.classList.remove('error');
-      toastIcon.innerHTML = '<i class="fa-solid fa-check"></i>';
-    }
-    toast.classList.add('show');
-    setTimeout(() => { toast.classList.remove('show'); }, 4000);
-  }
 
   document.getElementById('contactForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -284,7 +320,6 @@
       fullname: document.getElementById('fullname').value,
       email: document.getElementById('email').value,
       phone: document.getElementById('phone').value,
-      is_store_feedback: document.getElementById('storeFeedback').checked,
       message: document.getElementById('message').value
     };
 
@@ -296,20 +331,16 @@
       });
       const result = await response.json();
       if (result.success) {
-        showToast('Thành công!', 'Gửi thông tin liên hệ thành công! Bông Trà sẽ phản hồi sớm nhất.', false);
+        showNotification('Gửi thông tin liên hệ thành công! Bông Trà sẽ phản hồi sớm nhất.');
         document.getElementById('contactForm').reset();
       } else {
-        showToast('Thất bại!', result.message || 'Có lỗi xảy ra khi gửi!', true);
+        showNotification(result.message || 'Có lỗi xảy ra khi gửi!');
       }
     } catch (error) {
-      showToast('Lỗi kết nối!', 'Không thể kết nối đến máy chủ. Vui lòng thử lại!', true);
+      showNotification('Không thể kết nối đến máy chủ. Vui lòng thử lại!');
     } finally {
       btn.disabled = false;
-      btn.innerHTML = `
-        <img src="/image/icon_gui.jpg" class="btn-icon-img" alt="Gửi" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
-        <i class="fa-regular fa-paper-plane" style="display:none;"></i>
-        Gửi ngay
-      `;
+      btn.innerText = 'Gửi thông tin';
     }
   });
 </script>

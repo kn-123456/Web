@@ -68,7 +68,6 @@
       text-transform: uppercase; letter-spacing: 0.5px; text-decoration: none;
     }
 
-    /* DROPDOWN TÀI KHOẢN */
     .user-dropdown-wrapper {
       position: relative; display: flex; align-items: center; cursor: pointer; height: 60px;
     }
@@ -126,13 +125,23 @@
 </header>
 
 <script>
+  function forceResetCartBadgeIfLoggedOut() {
+    const loggedUser = localStorage.getItem('currentUser');
+    if (!loggedUser) {
+      document.querySelectorAll('.cart-badge-count').forEach(badge => {
+        badge.style.display = 'inline-block';
+        badge.innerText = '0';
+      });
+    }
+  }
+
   function initHeaderUser() {
     const loggedUser = localStorage.getItem('currentUser');
     const isVip = localStorage.getItem('isVipMember') === 'true';
     const authArea = document.getElementById('authArea');
     
-    let displayName = loggedUser || 'an2';
-    if (isVip && !displayName.includes('👑')) {
+    let displayName = loggedUser || '';
+    if (isVip && displayName && !displayName.includes('👑')) {
       displayName += ' 👑';
     }
 
@@ -146,7 +155,7 @@
           <div class="user-dropdown-content" style="display:none; position:absolute; right:0; top:60px; background:#fff; min-width:180px; box-shadow:0 8px 24px rgba(0,0,0,0.18); border-radius:8px; overflow:hidden; z-index:99999; border:1px solid #eaeaea;">
             <a href="/tai-khoan" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Tài Khoản Của Tôi</a>
             <a href="/don-mua" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Đơn Mua</a>
-            <a href="#" onclick="logoutUser(); return false;" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Đăng Xuất</a>
+            <a href="#" onclick="logoutUser(); return false;" style="color: #dc3545; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Đăng Xuất</a>
           </div>
         </div>
       `;
@@ -156,6 +165,8 @@
         wrap.addEventListener('mouseenter', () => cont.style.display = 'block');
         wrap.addEventListener('mouseleave', () => cont.style.display = 'none');
       }
+    } else if (authArea) {
+      authArea.innerHTML = `<a href="/login" class="btn-header-login">ĐĂNG NHẬP</a>`;
     }
 
     const cartBtn = document.querySelector('.cart-icon-btn');
@@ -163,31 +174,55 @@
       const badge = cartBtn.querySelector('.cart-badge-count');
       
       if (!loggedUser) {
-        localStorage.removeItem('cartList');
-        if (badge) badge.style.display = 'none';
+        if (badge) {
+          badge.style.display = 'inline-block';
+          badge.innerText = '0';
+        }
       } else {
-        const cart = JSON.parse(localStorage.getItem('cartList')) || [];
+        const cart = JSON.parse(localStorage.getItem(`cartList_${loggedUser}`)) || [];
         const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
         if (badge) {
           badge.style.display = 'inline-block';
           badge.innerText = totalCount;
         }
       }
+    }
+    
+    forceResetCartBadgeIfLoggedOut();
+  }
 
-      cartBtn.onclick = function() {
-        if (!loggedUser) {
-          window.location.href = '/login';
+  document.addEventListener('click', function(e) {
+    const cartBtn = e.target.closest('.cart-icon-btn');
+    if (cartBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      const loggedUser = localStorage.getItem('currentUser');
+      if (!loggedUser) {
+        alert('Vui lòng đăng nhập để xem giỏ hàng!');
+        window.location.href = '/login';
+      } else {
+        if (typeof openCartDrawer === 'function') {
+          openCartDrawer();
         } else {
           window.location.href = '/menu';
         }
-      };
+      }
     }
-  }
+  }, true);
 
   function logoutUser() {
+    // CHỈ XÓA PHIÊN ĐĂNG NHẬP VÀ VIP, GIỮ NGUYÊN GIỎ HÀNG RIÊNG CỦA TỪNG USER TRONG LOCALSTORAGE
     localStorage.removeItem('currentUser');
     localStorage.removeItem('isVipMember');
-    localStorage.removeItem('cartList');
+
     window.location.href = '/';
   }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initHeaderUser);
+  } else {
+    initHeaderUser();
+  }
+
+  setInterval(forceResetCartBadgeIfLoggedOut, 200);
 </script>

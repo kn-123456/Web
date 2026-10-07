@@ -89,7 +89,6 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    // Tự động nạp Header và kích hoạt hàm xử lý chung
     fetch('/header.html')
       .then(r => r.text())
       .then(html => { 
@@ -121,7 +120,11 @@
           errorMsg.style.display = 'none';
           localStorage.setItem('currentUser', username);
 
-          // >>> GỌI NGAY HÀM KHỞI TẠO HEADER ĐỂ NÓ CẬP NHẬT TỨC THÌ TRƯỚC KHI CHUYỂN TRANG <<<
+          // Đảm bảo user đăng nhập có giỏ hàng riêng, nếu chưa có thì tạo mới trống hoàn toàn
+          if (!localStorage.getItem(`cartList_${username}`)) {
+            localStorage.setItem(`cartList_${username}`, JSON.stringify([]));
+          }
+
           if (typeof initHeaderUser === 'function') {
             initHeaderUser();
           }

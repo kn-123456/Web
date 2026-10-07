@@ -114,7 +114,7 @@
       border-radius: 14px;
       padding: 18px 14px;
       text-align: center;
-      flex: 0 0 240px; /* Cố định chiều rộng mỗi thẻ để hiển thị hoàn hảo 5 cột cuộn ngang */
+      flex: 0 0 240px;
       min-width: 240px;
       height: 100%;
       display: flex;
@@ -204,6 +204,21 @@
     .cart-drawer-footer { padding: 20px; border-top: 1px solid #eee; background: #fff; }
     .btn-checkout-main { width: 100%; background: #00b050; color: #fff; border: none; border-radius: 8px; padding: 14px; font-weight: 700; text-align: center; display: block; text-decoration: none; }
 
+    /* TOAST THÔNG BÁO XINH XẮN */
+    .custom-toast-container {
+      position: fixed; bottom: 30px; right: 30px; z-index: 99999;
+    }
+    .custom-toast {
+      background: #ffffff; border-left: 4px solid var(--main-green);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15); border-radius: 10px;
+      padding: 14px 20px; display: flex; align-items: center; gap: 12px;
+      min-width: 300px; transform: translateY(100px); opacity: 0;
+      transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    }
+    .custom-toast.show { transform: translateY(0); opacity: 1; }
+    .custom-toast i { color: var(--main-green); font-size: 20px; }
+    .custom-toast-text { font-size: 13.5px; font-weight: 600; color: #333; margin: 0; }
+
     /* KHỐI TIN TỨC - KHUYẾN MÃI CUỘN NGANG */
     .news-scroll-wrapper {
       display: flex; gap: 16px; overflow-x: auto; padding: 10px 5px 20px 5px; scroll-behavior: smooth;
@@ -241,6 +256,14 @@
 
   <!-- NẠP HEADER -->
   <div id="header-include"></div>
+
+  <!-- KHUNG TOAST THÔNG BÁO XINH XẮN -->
+  <div class="custom-toast-container">
+    <div class="custom-toast" id="customToast">
+      <i class="fa-solid fa-circle-check"></i>
+      <p class="custom-toast-text" id="toastMessage">Thông báo thành công!</p>
+    </div>
+  </div>
 
   <!-- MODAL TÙY CHỌN SẢN PHẨM -->
   <div class="product-modal-overlay" id="productModal" onclick="checkCloseModal(event)">
@@ -353,15 +376,13 @@
     </div>
   </section>
 
-  <!-- SECTION SẢN PHẨM BEST SELLER (CUỘN NGANG ĐÚNG ẢNH TỪ DATABASE) -->
+  <!-- SECTION SẢN PHẨM BEST SELLER -->
   <section class="bestseller-section">
     <div class="container bestseller-container text-center">
       <h2 class="display-6 fw-bold text-white mb-2">SẢN PHẨM BEST SELLER</h2>
       <p class="text-white-50 small mb-4">Các sản phẩm đang được ưa chuộng và bán chạy trên tất cả hệ thống tại Bông Trà</p>
       
-      <div class="bestseller-scroll-wrapper" id="bestsellerProductsContainer">
-        <!-- Render động từ DB -->
-      </div>
+      <div class="bestseller-scroll-wrapper" id="bestsellerProductsContainer"></div>
     </div>
   </section>
 
@@ -455,6 +476,15 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
+    function showNotification(msg) {
+      const toast = document.getElementById('customToast');
+      document.getElementById('toastMessage').innerText = msg;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
     fetch('/header.html').then(r => r.text()).then(html => {
       document.getElementById('header-include').innerHTML = html;
       setTimeout(initHeaderUser, 100);
@@ -472,7 +502,7 @@
             <div class="user-dropdown-content" style="display:none; position:absolute; right:0; top:60px; background:#fff; min-width:180px; box-shadow:0 8px 24px rgba(0,0,0,0.18); border-radius:8px; overflow:hidden; z-index:99999;">
               <a href="/tai-khoan" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Tài Khoản Của Tôi</a>
               <a href="/don-mua" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Đơn Mua</a>
-              <a href="#" onclick="logoutUser(event)" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Đăng Xuất</a>
+              <a href="#" onclick="logoutUser(event)" style="color:#dc3545; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Đăng Xuất</a>
             </div>
           </div>
         `;
@@ -480,14 +510,18 @@
         const cont = authArea.querySelector('.user-dropdown-content');
         wrap.addEventListener('mouseenter', () => cont.style.display = 'block');
         wrap.addEventListener('mouseleave', () => cont.style.display = 'none');
+      } else if (authArea) {
+        authArea.innerHTML = `<a href="/login" class="btn-header-login">ĐĂNG NHẬP</a>`;
       }
       updateHeaderCartButton();
       renderProducts();
     }
 
     function logoutUser(e) {
-      e.preventDefault();
+      if (e) e.preventDefault();
+      // CHỈ XÓA PHIÊN ĐĂNG NHẬP, GIỮ NGUYÊN GIỎ HÀNG CỦA TỪNG USER
       localStorage.removeItem('currentUser');
+      localStorage.removeItem('isVipMember');
       window.location.href = '/';
     }
 
@@ -518,7 +552,8 @@
       try {
         const resProd = await fetch('/api/products/bestseller');
         const products = await resProd.json();
-        let cart = JSON.parse(localStorage.getItem('cartList')) || [];
+        const loggedUser = localStorage.getItem('currentUser');
+        let cart = loggedUser ? (JSON.parse(localStorage.getItem(`cartList_${loggedUser}`)) || []) : [];
 
         let prodHtml = '';
         products.forEach(p => {
@@ -551,30 +586,47 @@
     function updateHeaderCartButton() {
       const cartBtn = document.querySelector('.cart-icon-btn');
       if (!cartBtn) return;
-      const cart = JSON.parse(localStorage.getItem('cartList')) || [];
-      const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
       const badge = cartBtn.querySelector('.cart-badge-count');
-      if (badge) badge.innerText = totalCount;
+      const loggedUser = localStorage.getItem('currentUser');
+
+      if (!loggedUser) {
+        if (badge) {
+          badge.style.display = 'inline-block';
+          badge.innerText = '0';
+        }
+      } else {
+        const cart = JSON.parse(localStorage.getItem(`cartList_${loggedUser}`)) || [];
+        const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+        if (badge) {
+          badge.style.display = 'inline-block';
+          badge.innerText = totalCount;
+        }
+      }
 
       cartBtn.onclick = function() {
-        const loggedUser = localStorage.getItem('currentUser');
-        if (!loggedUser) alert('Vui lòng đăng nhập để xem giỏ hàng!');
-        else openCartDrawer();
+        if (!loggedUser) {
+          showNotification('Vui lòng đăng nhập để xem giỏ hàng!');
+          setTimeout(() => { window.location.href = '/login'; }, 1000);
+        } else {
+          openCartDrawer();
+        }
       };
     }
 
     function handleProductClick(title, price, img, desc) {
       const loggedUser = localStorage.getItem('currentUser');
       if (!loggedUser) {
-        alert('Vui lòng đăng nhập để đặt đơn.');
-        window.location.href = '/login';
+        showNotification('Vui lòng đăng nhập để đặt đơn.');
+        setTimeout(() => { window.location.href = '/login'; }, 1000);
       } else {
         openProductModal(title, price, img, desc, null, null);
       }
     }
 
     function editProductInCart(title) {
-      let cart = JSON.parse(localStorage.getItem('cartList')) || [];
+      const loggedUser = localStorage.getItem('currentUser');
+      if (!loggedUser) return;
+      let cart = JSON.parse(localStorage.getItem(`cartList_${loggedUser}`)) || [];
       let existingItemIndex = cart.findIndex(item => item.title === title);
       if (existingItemIndex !== -1) {
         let item = cart[existingItemIndex];
@@ -630,15 +682,11 @@
     function closeProductModal() { document.getElementById('productModal').classList.remove('active'); }
     
     function checkCloseModal(e) {
-      if (e.target.id === 'productModal') {
-        closeProductModal();
-      }
+      if (e.target.id === 'productModal') closeProductModal();
     }
 
     function checkCloseCart(e) {
-      if (e.target.id === 'cartDrawer') {
-        toggleCartDrawer(false);
-      }
+      if (e.target.id === 'cartDrawer') toggleCartDrawer(false);
     }
 
     function updateModalQty(change) {
@@ -664,6 +712,13 @@
     });
 
     function confirmAddToCart() {
+      const loggedUser = localStorage.getItem('currentUser');
+      if (!loggedUser) {
+        showNotification('Vui lòng đăng nhập để đặt đơn.');
+        setTimeout(() => { window.location.href = '/login'; }, 1000);
+        return;
+      }
+
       const selectedSweetness = document.querySelector('input[name="sweetness"]:checked')?.value || 'Bình thường';
       const selectedIce = document.querySelector('input[name="ice"]:checked')?.value || '50% Đá';
       let selectedToppings = [];
@@ -672,7 +727,7 @@
       });
       const specialReq = document.getElementById('modalSpecialReq').value;
 
-      let cart = JSON.parse(localStorage.getItem('cartList')) || [];
+      let cart = JSON.parse(localStorage.getItem(`cartList_${loggedUser}`)) || [];
 
       const newItemData = {
         title: currentProduct.title,
@@ -691,12 +746,13 @@
         cart.push(newItemData);
       }
 
-      localStorage.setItem('cartList', JSON.stringify(cart));
+      localStorage.setItem(`cartList_${loggedUser}`, JSON.stringify(cart));
 
       closeProductModal();
       updateHeaderCartButton();
       renderProducts();
       openCartDrawer();
+      showNotification('Đã thêm sản phẩm vào giỏ hàng thành công!');
     }
 
     function openCartDrawer() {
@@ -710,7 +766,8 @@
     function renderCartDrawerItems() {
       const body = document.getElementById('cartDrawerBody');
       const totalSpan = document.getElementById('cartDrawerTotal');
-      let cart = JSON.parse(localStorage.getItem('cartList')) || [];
+      const loggedUser = localStorage.getItem('currentUser');
+      let cart = loggedUser ? (JSON.parse(localStorage.getItem(`cartList_${loggedUser}`)) || []) : [];
 
       if (cart.length === 0) {
         body.innerHTML = `<p class="text-center text-muted my-5">Giỏ hàng của bạn đang trống.</p>`;
@@ -757,19 +814,23 @@
     }
 
     function changeCartQty(index, change) {
-      let cart = JSON.parse(localStorage.getItem('cartList')) || [];
+      const loggedUser = localStorage.getItem('currentUser');
+      if (!loggedUser) return;
+      let cart = JSON.parse(localStorage.getItem(`cartList_${loggedUser}`)) || [];
       cart[index].quantity += change;
       if (cart[index].quantity <= 0) cart.splice(index, 1);
-      localStorage.setItem('cartList', JSON.stringify(cart));
+      localStorage.setItem(`cartList_${loggedUser}`, JSON.stringify(cart));
       renderCartDrawerItems();
       updateHeaderCartButton();
       renderProducts();
     }
 
     function removeCartItem(index) {
-      let cart = JSON.parse(localStorage.getItem('cartList')) || [];
+      const loggedUser = localStorage.getItem('currentUser');
+      if (!loggedUser) return;
+      let cart = JSON.parse(localStorage.getItem(`cartList_${loggedUser}`)) || [];
       cart.splice(index, 1);
-      localStorage.setItem('cartList', JSON.stringify(cart));
+      localStorage.setItem(`cartList_${loggedUser}`, JSON.stringify(cart));
       renderCartDrawerItems();
       updateHeaderCartButton();
       renderProducts();

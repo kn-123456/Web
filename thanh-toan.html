@@ -3,218 +3,277 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bước cuối cùng - Thanh toán - Bông Trà</title>
+  <title>Thanh Toán Đơn Hàng - Bông Trà</title>
+  
+  <!-- BOOTSTRAP 5 & FONTAWESOME -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
   <style>
-    :root { --main-green: #00b050; }
+    :root { --main-green: #006030; }
+
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f7f9fa;
+      background: #fbf9f5 url('https://www.transparenttextures.com/patterns/paper.png');
       color: #333;
-      padding-top: 80px;
-      padding-bottom: 100px;
+      padding-top: 40px;
+      padding-bottom: 120px;
     }
-    .checkout-container {
-      max-width: 650px;
+
+    .checkout-wrapper {
+      max-width: 720px;
       margin: 0 auto;
       padding: 0 15px;
     }
-    .checkout-card {
-      background: #ffffff;
-      border-radius: 12px;
-      border: 1px solid #eaeaea;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-    }
-    .card-section-title {
-      font-size: 16px;
-      font-weight: 700;
-      color: #111;
-      margin-bottom: 15px;
-    }
-    .map-preview-box {
-      width: 100%;
-      height: 110px;
-      background: #e5e3df url('https://maps.googleapis.com/maps/api/staticmap?center=10.7769,106.6315&zoom=15&size=600x150&key=') center/cover no-repeat;
-      border-radius: 8px;
-      border: 1px solid #ddd;
-      position: relative;
-      margin-bottom: 12px;
+
+    /* TOP HEADER BAR VỚI NÚT QUAY VỀ */
+    .checkout-top-bar {
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: space-between;
+      margin-bottom: 25px;
+      background: #ffffff;
+      padding: 15px 20px;
+      border-radius: 14px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+      border: 1px solid #eaeaea;
     }
-    .map-pin { color: #e53935; font-size: 24px; }
+
+    .btn-back-home {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--main-green);
+      font-weight: 700;
+      font-size: 13.5px;
+      text-decoration: none;
+      background: #e8f5ed;
+      padding: 8px 16px;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+
+    .btn-back-home:hover {
+      background: var(--main-green);
+      color: #ffffff;
+    }
+
+    /* KHỐI THẺ THANH TOÁN */
+    .checkout-card {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1px solid #eaeaea;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+    }
+
+    .card-section-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--main-green);
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
     .form-control-custom {
       font-size: 13.5px;
-      border: 1px solid #ced4da;
-      border-radius: 6px;
-      padding: 10px;
-      margin-bottom: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 12px 15px;
+      margin-bottom: 12px;
     }
+
+    .form-control-custom:focus {
+      border-color: var(--main-green);
+      box-shadow: 0 0 0 0.2rem rgba(0, 96, 48, 0.15);
+    }
+
     .order-item-row {
       display: flex;
-      align-items: flex-start;
+      align-items: center;
+      justify-content: space-between;
       padding: 12px 0;
       border-bottom: 1px solid #f2f2f2;
     }
     .order-item-row:last-child { border-bottom: none; }
+
     .promo-box-inner {
-      border: 1px solid #e0e0e0;
-      border-radius: 8px;
-      padding: 12px 15px;
-      margin-top: 10px;
+      border: 1px dashed var(--main-green);
+      background: #f4fbf7;
+      border-radius: 10px;
+      padding: 15px;
+      margin-top: 12px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
+
     .btn-apply-promo {
-      background: #fff;
-      color: #00b050;
-      border: 1px solid #00b050;
+      background: #ffffff;
+      color: var(--main-green);
+      border: 1.5px solid var(--main-green);
       font-weight: 700;
       font-size: 12px;
-      padding: 6px 14px;
-      border-radius: 6px;
+      padding: 8px 16px;
+      border-radius: 8px;
       cursor: pointer;
+      transition: 0.2s;
     }
     .btn-apply-promo.applied {
-      background: #00b050;
-      color: #fff;
+      background: var(--main-green);
+      color: #ffffff;
     }
-    /* Thanh tổng tiền cố định dưới cùng */
+
+    /* THANH TỔNG TIỀN CỐ ĐỊNH DƯỚI CÙNG */
     .checkout-bottom-bar {
       position: fixed;
       bottom: 0; left: 0; right: 0;
       background: #ffffff;
       border-top: 1px solid #eaeaea;
-      padding: 15px 20px;
-      box-shadow: 0 -4px 15px rgba(0,0,0,0.05);
-      z-index: 999;
+      padding: 18px 20px;
+      box-shadow: 0 -6px 25px rgba(0,0,0,0.08);
+      z-index: 99999;
     }
     .checkout-bottom-content {
-      max-width: 650px;
+      max-width: 720px;
       margin: 0 auto;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
     .btn-submit-order {
-      background-color: #00b050;
+      background-color: var(--main-green);
       color: #ffffff;
       border: none;
-      border-radius: 8px;
-      padding: 12px 35px;
+      border-radius: 10px;
+      padding: 12px 38px;
       font-size: 15px;
-      font-weight: 700;
+      font-weight: 800;
       cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: background 0.2s;
+    }
+    .btn-submit-order:hover {
+      background-color: #004d25;
     }
   </style>
 </head>
 <body>
 
-  <div class="checkout-container">
-    <!-- Tiêu đề trang -->
-    <div class="mb-4">
-      <h3 class="fw-bold text-dark mb-1">Bước cuối cùng - Thanh toán</h3>
-      <p class="text-secondary small mb-0">Trà Sữa Bông Trà - Lũy Bán Bích</p>
+  <div class="checkout-wrapper">
+    
+    <!-- TOP BAR VỚI NÚT QUAY VỀ TRANG CHỦ / MENU -->
+    <div class="checkout-top-bar">
+      <div>
+        <h3 class="fw-bold text-dark mb-1" style="font-size: 20px;">Xác Nhận Thanh Toán</h3>
+        <p class="text-muted small mb-0"><i class="fa-solid fa-store me-1 text-success"></i> Trà Sữa Bông Trà - Lũy Bán Bích</p>
+      </div>
+      <a href="/" class="btn-back-home"><i class="fa-solid fa-arrow-left"></i> Trang Chủ</a>
     </div>
 
-    <!-- 1. GIAO ĐẾN -->
+    <!-- 1. THÔNG TIN GIAO HÀNG -->
     <div class="checkout-card">
-      <div class="card-section-title">Giao đến</div>
-      <div class="text-muted small mb-2">Delivery arrival time: <strong>29 min (1,2 km away)</strong></div>
-      <div class="map-preview-box">
-        <i class="fa-solid fa-location-dot map-pin"></i>
-      </div>
-      <input type="text" class="form-control form-control-custom" value="389 Lũy Bán Bích, P.Hiệp Tân, TP.Hồ Chí Minh" placeholder="Địa chỉ">
-      <input type="text" class="form-control form-control-custom" value="389 Lũy Bán Bích - 389 Lũy Bán Bích, P.Hiệp Tân, TP.HCM" placeholder="Chi tiết địa chỉ">
-      <input type="text" class="form-control form-control-custom mb-0" placeholder="Chỉ chú cho tài xế (Ví dụ: Hãy gặp tôi tại sảnh)">
+      <div class="card-section-title"><i class="fa-solid fa-location-dot"></i> Địa chỉ nhận hàng</div>
+      <div class="text-muted small mb-3">Thời gian giao hàng dự kiến: <strong class="text-success">25 - 30 phút (1.2 km)</strong></div>
+      
+      <input type="text" id="deliveryName" class="form-control form-control-custom" placeholder="Họ và tên người nhận">
+      <input type="text" id="deliveryPhone" class="form-control form-control-custom" placeholder="Số điện thoại nhận hàng">
+      <input type="text" id="deliveryAddress" class="form-control form-control-custom mb-0" value="389 Lũy Bán Bích, Phường Hiệp Tân, TP. Hồ Chí Minh" placeholder="Địa chỉ chi tiết">
     </div>
 
     <!-- 2. TÓM TẮT ĐƠN HÀNG -->
     <div class="checkout-card">
-      <div class="card-section-title">Tóm tắt đơn hàng</div>
-      <div id="checkoutItemsList">
-        <!-- Render danh sách sản phẩm từ localStorage -->
-      </div>
+      <div class="card-section-title"><i class="fa-solid fa-bag-shopping"></i> Tóm tắt món đã chọn</div>
+      <div id="checkoutItemsList"></div>
       
-      <div class="pt-3 border-top mt-2">
-        <div class="d-flex justify-content-between small text-secondary mb-1">
-          <span>Tổng tạm tính</span>
+      <div class="pt-3 border-top mt-3">
+        <div class="d-flex justify-content-between small text-secondary mb-2">
+          <span>Tổng tiền tạm tính</span>
           <span id="subTotalText" class="fw-bold text-dark">0 đ</span>
         </div>
         <div class="d-flex justify-content-between small text-secondary">
-          <span>Phi giao hàng và phí áp dụng <i class="fa-solid fa-circle-info"></i></span>
+          <span>Phí vận chuyển tiêu chuẩn</span>
           <span class="fw-bold text-dark">26.000 đ</span>
         </div>
       </div>
     </div>
 
-    <!-- 3. CHI TIẾT THANH TOÁN -->
+    <!-- 3. PHƯƠNG THỨC THANH TOÁN -->
     <div class="checkout-card">
-      <div class="card-section-title">Chi tiết thanh toán</div>
-      <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
-        <div class="d-flex align-items-center gap-2">
-          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQhQ2d9X4nK2L3N5o8P1v9z5V6j7K8L9m0&s" width="24" onerror="this.src='https://cdn-icons-png.flaticon.com/512/174/174848.png'">
-          <span class="small fw-semibold">Zalopay ••••2479</span>
+      <div class="card-section-title"><i class="fa-solid fa-wallet"></i> Phương thức thanh toán</div>
+      <div class="d-flex justify-content-between align-items-center py-2 px-3 border rounded-3 bg-light">
+        <div class="d-flex align-items-center gap-3">
+          <i class="fa-solid fa-money-bill-wave text-success fs-4"></i>
+          <div>
+            <span class="fw-bold d-block" style="font-size: 13.5px;">Thanh toán khi nhận hàng (COD)</span>
+            <span class="text-muted" style="font-size: 11.5px;">Thanh toán bằng tiền mặt khi tài xế giao đến</span>
+          </div>
         </div>
-        <i class="fa-solid fa-chevron-right text-muted small"></i>
-      </div>
-      <div class="d-flex justify-content-between align-items-center pt-3">
-        <span class="small text-muted">Hồ sơ</span>
-        <select class="form-select form-select-sm w-auto">
-          <option selected>Cá nhân</option>
-        </select>
+        <input type="radio" name="paymentMethod" checked class="form-check-input">
       </div>
     </div>
 
-    <!-- 4. KHUYẾN MÃI -->
-    <div class="checkout-card mb-5">
-      <div class="card-section-title">Khuyến mãi</div>
-      <div class="input-group mb-2">
-        <input type="text" class="form-control form-control-custom mb-0" placeholder="Nhập mã khuyến mãi">
-        <button class="btn btn-secondary px-4" type="button" style="height: 42px; border-radius: 0 6px 6px 0;">Áp dụng</button>
+    <!-- 4. MÃ KHUYẾN MÃI -->
+    <div class="checkout-card mb-4">
+      <div class="card-section-title"><i class="fa-solid fa-ticket"></i> Mã ưu đãi / Khuyến mãi</div>
+      <div class="input-group">
+        <input type="text" id="promoCodeInput" class="form-control form-control-custom mb-0" placeholder="Nhập mã ưu đãi (Ví dụ: BONGTRA20K)">
+        <button class="btn btn-outline-success px-4 fw-bold" type="button" onclick="applyManualPromo()" style="border-radius: 0 8px 8px 0; font-size: 13px;">Áp dụng</button>
       </div>
       
       <div class="promo-box-inner">
         <div>
-          <span class="fw-bold small d-block">Tích lũy 50 GrabXu</span>
-          <span class="text-success small fw-bold" style="font-size: 11px;">Promo Code: THUONGDIEMAS</span>
-          <span class="text-muted d-block" style="font-size: 10px;">Valid 2026-10-05 to 2026-10-11</span>
+          <span class="fw-bold small d-block text-success">Giảm ngay 20.000đ đơn từ 50k</span>
+          <span class="text-muted small" style="font-size: 11px;">Mã tự động: <strong>BONGTRA20K</strong></span>
         </div>
         <button class="btn-apply-promo" id="btnPromo" onclick="applyPromoCode()">ÁP DỤNG</button>
       </div>
     </div>
+
   </div>
 
-  <!-- THANH CỐ ĐỊNH DƯỚI CÙNG: TỔNG CỘNG & NÚT ĐẶT ĐƠN -->
+  <!-- THANH CỐ ĐỊNH DƯỚI CÙNG -->
   <div class="checkout-bottom-bar">
     <div class="checkout-bottom-content">
       <div>
-        <span class="text-secondary small d-block">Tổng cộng</span>
-        <span class="fs-5 fw-bold text-success" id="grandTotalText">0 đ</span>
+        <span class="text-secondary small d-block">Tổng thanh toán</span>
+        <span class="fs-4 fw-bold text-success" id="grandTotalText">0 đ</span>
       </div>
-      <button class="btn-submit-order" onclick="submitFinalOrder()">Đặt đơn</button>
+      <button class="btn-submit-order" onclick="submitFinalOrder()">Đặt đơn ngay</button>
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     let isPromoApplied = false;
     const SHIPPING_FEE = 26000;
 
     window.addEventListener('DOMContentLoaded', () => {
+      const loggedUser = localStorage.getItem('currentUser');
+      if (loggedUser) {
+        document.getElementById('deliveryName').value = loggedUser;
+      }
       renderCheckoutSummary();
     });
 
+    function getCartKey() {
+      const loggedUser = localStorage.getItem('currentUser');
+      return loggedUser ? `cartList_${loggedUser}` : 'cartList';
+    }
+
     function renderCheckoutSummary() {
       const container = document.getElementById('checkoutItemsList');
-      let cart = JSON.parse(localStorage.getItem('cartList')) || [];
+      const cartKey = getCartKey();
+      let cart = JSON.parse(localStorage.getItem(cartKey)) || [];
 
       if (cart.length === 0) {
-        container.innerHTML = `<p class="text-center text-muted small my-3">Chưa có sản phẩm nào trong giỏ hàng.</p>`;
+        container.innerHTML = `<p class="text-center text-muted small my-3">Giỏ hàng của bạn đang trống.</p>`;
         document.getElementById('subTotalText').innerText = '0 đ';
         document.getElementById('grandTotalText').innerText = '0 đ';
         return;
@@ -223,7 +282,7 @@
       let html = '';
       let subTotal = 0;
 
-      cart.forEach(item => {
+      cart.forEach((item, index) => {
         let itemPrice = item.price;
         let toppingsDesc = '';
         if (item.toppings) {
@@ -237,16 +296,15 @@
 
         html += `
           <div class="order-item-row">
-            <div class="d-flex align-items-center gap-2" style="width: 80px;">
-              <span class="text-primary fw-bold small">− ${item.quantity} +</span>
-              <img src="${item.img}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px;">
-            </div>
-            <div style="flex-grow: 1; padding: 0 10px;">
-              <h6 class="fw-bold mb-1" style="font-size: 13px;">${item.title}</h6>
-              <small class="text-muted" style="font-size: 11px;">${item.sweetness}, ${item.ice}${toppingsDesc}</small>
+            <div class="d-flex align-items-center gap-3">
+              <img src="${item.img}" style="width: 45px; height: 45px; object-fit: cover; border-radius: 8px;" onerror="this.src='/image/logo1.png'">
+              <div>
+                <h6 class="fw-bold mb-1" style="font-size: 13.5px;">${item.title} <span class="text-muted fw-normal">(x${item.quantity})</span></h6>
+                <small class="text-muted" style="font-size: 11px;">${item.sweetness || ''}, ${item.ice || ''}${toppingsDesc}</small>
+              </div>
             </div>
             <div class="text-end">
-              <span class="fw-bold text-dark" style="font-size: 13.5px;">${itemTotal.toLocaleString('vi-VN')}</span>
+              <span class="fw-bold text-dark" style="font-size: 14px;">${itemTotal.toLocaleString('vi-VN')} đ</span>
             </div>
           </div>
         `;
@@ -256,7 +314,9 @@
       document.getElementById('subTotalText').innerText = subTotal.toLocaleString('vi-VN') + ' đ';
       
       let grandTotal = subTotal + SHIPPING_FEE;
-      if (isPromoApplied) grandTotal -= 20000; // Giảm 20k nếu áp dụng mã ưu đãi
+      if (isPromoApplied) grandTotal -= 20000;
+      if (grandTotal < 0) grandTotal = 0;
+
       document.getElementById('grandTotalText').innerText = grandTotal.toLocaleString('vi-VN') + ' đ';
     }
 
@@ -273,16 +333,54 @@
       renderCheckoutSummary();
     }
 
+    function applyManualPromo() {
+      const code = document.getElementById('promoCodeInput').value.trim().toUpperCase();
+      if (code === 'BONGTRA20K') {
+        isPromoApplied = true;
+        const btn = document.getElementById('btnPromo');
+        btn.innerText = 'ĐÃ ÁP DỤNG';
+        btn.classList.add('applied');
+        renderCheckoutSummary();
+        alert('Áp dụng mã khuyến mãi thành công (-20.000đ)!');
+      } else {
+        alert('Mã khuyến mãi không hợp lệ hoặc đã hết hạn!');
+      }
+    }
+
     function submitFinalOrder() {
-      let cart = JSON.parse(localStorage.getItem('cartList')) || [];
+      const cartKey = getCartKey();
+      let cart = JSON.parse(localStorage.getItem(cartKey)) || [];
       if (cart.length === 0) {
         alert('Giỏ hàng của bạn đang trống!');
         return;
       }
 
-      alert('Đặt đơn hàng thành công! Cảm ơn bạn đã ủng hộ Bông Trà.');
-      localStorage.removeItem('cartList'); // Xóa giỏ hàng sau khi đặt thành công
-      window.location.href = '/'; // Quay về trang chủ
+      const name = document.getElementById('deliveryName').value.trim();
+      const phone = document.getElementById('deliveryPhone').value.trim();
+      const address = document.getElementById('deliveryAddress').value.trim();
+
+      if (!name || !phone || !address) {
+        alert('Vui lòng điền đầy đủ họ tên, số điện thoại và địa chỉ nhận hàng!');
+        return;
+      }
+
+      let orders = JSON.parse(localStorage.getItem('bongtra_orders')) || [];
+      const newOrder = {
+        id: 'BT' + Math.floor(10000 + Math.random() * 90000),
+        date: new Date().toLocaleDateString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric' }),
+        items: cart,
+        total: document.getElementById('grandTotalText').innerText,
+        address: address,
+        status: 'Đang chuẩn bị'
+      };
+      orders.unshift(newOrder);
+      localStorage.setItem('bongtra_orders', JSON.stringify(orders));
+
+      // Xóa giỏ hàng riêng của user sau khi đặt đơn thành công
+      localStorage.removeItem(cartKey);
+
+      alert('🎉 Đặt đơn hàng thành công! Cảm ơn bạn đã ủng hộ Bông Trà.');
+      window.location.href = '/don-mua';
     }
   </script>
 </body>

@@ -136,6 +136,7 @@
   function initHeaderUser() {
     const loggedUser = localStorage.getItem('currentUser');
     const authArea = document.getElementById('authArea');
+    
     if (loggedUser && authArea) {
       authArea.innerHTML = `
         <div class="user-dropdown-wrapper" style="position:relative; display:flex; align-items:center; cursor:pointer; height:60px;">
@@ -146,7 +147,7 @@
           <div class="user-dropdown-content" style="display:none; position:absolute; right:0; top:60px; background:#fff; min-width:180px; box-shadow:0 8px 24px rgba(0,0,0,0.18); border-radius:8px; overflow:hidden; z-index:99999; border:1px solid #eaeaea;">
             <a href="/tai-khoan" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Tài Khoản Của Tôi</a>
             <a href="/don-mua" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Đơn Mua</a>
-            <a href="#" onclick="localStorage.removeItem('currentUser'); window.location.href='/'; return false;" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Đăng Xuất</a>
+            <a href="#" onclick="logoutUser(event)" style="color:#dc3545; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Đăng Xuất</a>
           </div>
         </div>
       `;
@@ -156,13 +157,28 @@
         wrap.addEventListener('mouseenter', () => cont.style.display = 'block');
         wrap.addEventListener('mouseleave', () => cont.style.display = 'none');
       }
+    } else if (authArea) {
+      authArea.innerHTML = `<a href="/login" class="btn-header-login">ĐĂNG NHẬP</a>`;
     }
+
     const cartBtn = document.querySelector('.cart-icon-btn');
     if (cartBtn) {
-      const cart = JSON.parse(localStorage.getItem('cartList')) || [];
-      const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
       const badge = cartBtn.querySelector('.cart-badge-count');
-      if (badge) badge.innerText = totalCount;
+      
+      if (!loggedUser) {
+        if (badge) {
+          badge.style.display = 'inline-block';
+          badge.innerText = '0';
+        }
+      } else {
+        const cart = JSON.parse(localStorage.getItem(`cartList_${loggedUser}`)) || [];
+        const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+        if (badge) {
+          badge.style.display = 'inline-block';
+          badge.innerText = totalCount;
+        }
+      }
+
       cartBtn.onclick = function() {
         if (!loggedUser) {
           alert('Vui lòng đăng nhập để xem giỏ hàng!');
@@ -172,6 +188,14 @@
         }
       };
     }
+  }
+
+  function logoutUser(e) {
+    if (e) e.preventDefault();
+    // CHỈ XÓA PHIÊN ĐĂNG NHẬP, GIỮ NGUYÊN GIỎ HÀNG CỦA TỪNG USER TRONG LOCALSTORAGE
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('isVipMember');
+    window.location.href = '/';
   }
 
   fetch('/header.html').then(r => r.text()).then(html => { 

@@ -7,7 +7,7 @@
   
   <!-- BOOTSTRAP 5 & FONTAWESOME -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <!-- LEAFLET MAPS CSS & JS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -51,7 +51,7 @@
       margin: 0 auto 12px;
     }
 
-    /* 1. KHỐI THẺ DANH SÁCH CỬA HÀNG BÊN TRÊN (GIỮ NGUYÊN) */
+    /* 1. KHỐI THẺ DANH SÁCH CỬA HÀNG */
     .store-list-card {
       background: #ffffff;
       border-radius: 14px;
@@ -163,7 +163,7 @@
       color: #fff;
     }
 
-    /* 2. KHỐI BẢN ĐỒ BÔNG TRÀ TRÊN BẢN ĐỒ */
+    /* 2. KHỐI BẢN ĐỒ */
     .map-frame-card {
       background: #ffffff;
       border-radius: 16px;
@@ -179,7 +179,6 @@
       z-index: 1;
     }
 
-    /* Marker Logo Bông Trà Xanh Tròn Trên Bản Đồ */
     .bongtra-map-marker-icon {
       width: 38px;
       height: 38px;
@@ -189,6 +188,42 @@
       object-fit: cover;
       background-color: var(--main-green);
     }
+
+    /* TOAST THÔNG BÁO XINH XẮN HIỆN ĐẠI */
+    .custom-toast-container {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      z-index: 99999;
+    }
+    .custom-toast {
+      background: #ffffff;
+      border-left: 4px solid var(--main-green);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      border-radius: 10px;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 300px;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    }
+    .custom-toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    .custom-toast i.fa-circle-check {
+      color: var(--main-green);
+      font-size: 20px;
+    }
+    .custom-toast-text {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #333;
+      margin: 0;
+    }
   </style>
 </head>
 <body>
@@ -196,7 +231,7 @@
   <!-- NẠP HEADER CHUNG -->
   <div id="header-include"></div>
 
-  <!-- SECTION 1: TÌM BÔNG TRÀ GẦN BẠN (DANH SÁCH CỬA HÀNG GIỮ NGUYÊN) -->
+  <!-- SECTION 1: DANH SÁCH CỬA HÀNG -->
   <section class="paper-section">
     <div class="container text-center">
       <h2 class="display-6 section-title">TÌM BÔNG TRÀ GẦN BẠN</h2>
@@ -334,7 +369,7 @@
     </div>
   </section>
 
-  <!-- SECTION 2: BÔNG TRÀ TRÊN BẢN ĐỒ (SỬ DỤNG LEAFLET CÓ MARKER LOGO CỬA HÀNG) -->
+  <!-- SECTION 2: BẢN ĐỒ -->
   <section class="paper-section pt-0">
     <div class="container text-center">
       <h2 class="display-6 section-title">BÔNG TRÀ TRÊN BẢN ĐỒ</h2>
@@ -347,91 +382,124 @@
     </div>
   </section>
 
+  <!-- KHUNG TOAST THÔNG BÁO XINH XẮN -->
+  <div class="custom-toast-container">
+    <div class="custom-toast" id="customToast">
+      <i class="fa-solid fa-circle-check"></i>
+      <p class="custom-toast-text" id="toastMessage">Thông báo thành công!</p>
+    </div>
+  </div>
+
   <!-- NẠP FOOTER CHUNG -->
   <div id="footer-include"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
- <script>
-  function initHeaderUser() {
-    const loggedUser = localStorage.getItem('currentUser');
-    const authArea = document.getElementById('authArea');
-    if (loggedUser && authArea) {
-      authArea.innerHTML = `
-        <div class="user-dropdown-wrapper" style="position:relative; display:flex; align-items:center; cursor:pointer; height:60px;">
-          <div style="display:flex; align-items:center; gap:8px;">
-            <img src="/image/icon_toi.png" alt="Tôi" style="width:30px; height:30px; border-radius:50%; object-fit:cover; border:1.5px solid #fff;" onerror="this.src='/image/logo1.png'">
-            <span style="color:#fff; font-size:12px; font-weight:800; text-transform:uppercase;">${loggedUser}</span>
+  <script>
+    function showNotification(msg) {
+      const toast = document.getElementById('customToast');
+      document.getElementById('toastMessage').innerText = msg;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    function initHeaderUser() {
+      const loggedUser = localStorage.getItem('currentUser');
+      const authArea = document.getElementById('authArea');
+      if (loggedUser && authArea) {
+        authArea.innerHTML = `
+          <div class="user-dropdown-wrapper" style="position:relative; display:flex; align-items:center; cursor:pointer; height:60px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <img src="/image/icon_toi.png" alt="Tôi" style="width:30px; height:30px; border-radius:50%; object-fit:cover; border:1.5px solid #fff;" onerror="this.src='/image/logo1.png'">
+              <span style="color:#fff; font-size:12px; font-weight:800; text-transform:uppercase;">${loggedUser}</span>
+            </div>
+            <div class="user-dropdown-content" style="display:none; position:absolute; right:0; top:60px; background:#fff; min-width:180px; box-shadow:0 8px 24px rgba(0,0,0,0.18); border-radius:8px; overflow:hidden; z-index:99999; border:1px solid #eaeaea;">
+              <a href="/tai-khoan" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Tài Khoản Của Tôi</a>
+              <a href="/don-mua" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Đơn Mua</a>
+              <a href="#" onclick="logoutUser(event)" style="color:#dc3545; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Đăng Xuất</a>
+            </div>
           </div>
-          <div class="user-dropdown-content" style="display:none; position:absolute; right:0; top:60px; background:#fff; min-width:180px; box-shadow:0 8px 24px rgba(0,0,0,0.18); border-radius:8px; overflow:hidden; z-index:99999; border:1px solid #eaeaea;">
-            <a href="/tai-khoan" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Tài Khoản Của Tôi</a>
-            <a href="/don-mua" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Đơn Mua</a>
-            <a href="#" onclick="localStorage.removeItem('currentUser'); window.location.href='/'; return false;" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Đăng Xuất</a>
-          </div>
-        </div>
-      `;
-      const wrap = authArea.querySelector('.user-dropdown-wrapper');
-      const cont = authArea.querySelector('.user-dropdown-content');
-      if(wrap && cont) {
-        wrap.addEventListener('mouseenter', () => cont.style.display = 'block');
-        wrap.addEventListener('mouseleave', () => cont.style.display = 'none');
+        `;
+        const wrap = authArea.querySelector('.user-dropdown-wrapper');
+        const cont = authArea.querySelector('.user-dropdown-content');
+        if(wrap && cont) {
+          wrap.addEventListener('mouseenter', () => cont.style.display = 'block');
+          wrap.addEventListener('mouseleave', () => cont.style.display = 'none');
+        }
+      } else if (authArea) {
+        authArea.innerHTML = `<a href="/login" class="btn-header-login">ĐĂNG NHẬP</a>`;
+      }
+
+      const cartBtn = document.querySelector('.cart-icon-btn');
+      if (cartBtn) {
+        const badge = cartBtn.querySelector('.cart-badge-count');
+        if (!loggedUser) {
+          if (badge) { badge.style.display = 'inline-block'; badge.innerText = '0'; }
+        } else {
+          const cart = JSON.parse(localStorage.getItem(`cartList_${loggedUser}`)) || [];
+          const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+          if (badge) { badge.style.display = 'inline-block'; badge.innerText = totalCount; }
+        }
+        cartBtn.onclick = function() {
+          if (!loggedUser) {
+            showNotification('Vui lòng đăng nhập để xem giỏ hàng!');
+            setTimeout(() => { window.location.href = '/login'; }, 1000);
+          } else {
+            window.location.href = '/menu';
+          }
+        };
       }
     }
-    const cartBtn = document.querySelector('.cart-icon-btn');
-    if (cartBtn) {
-      const cart = JSON.parse(localStorage.getItem('cartList')) || [];
-      const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-      const badge = cartBtn.querySelector('.cart-badge-count');
-      if (badge) badge.innerText = totalCount;
-      cartBtn.onclick = function() {
-        if (!loggedUser) {
-          alert('Vui lòng đăng nhập để xem giỏ hàng!');
-          window.location.href = '/login';
-        } else {
-          window.location.href = '/menu';
-        }
-      };
+
+    function logoutUser(e) {
+      if (e) e.preventDefault();
+      // CHỈ XÓA PHIÊN ĐĂNG NHẬP HIỆN TẠI, GIỮ NGUYÊN GIỎ HÀNG RIÊNG CỦA TỪNG USER
+      localStorage.removeItem('currentUser');
+      localStorage.removeItem('isVipMember');
+      window.location.href = '/';
     }
-  }
 
-  fetch('/header.html').then(r => r.text()).then(html => { 
-    document.getElementById('header-include').innerHTML = html;
-    initHeaderUser();
-  });
-  fetch('/footer.html').then(r => r.text()).then(html => { document.getElementById('footer-include').innerHTML = html; });
+    fetch('/header.html').then(r => r.text()).then(html => { 
+      document.getElementById('header-include').innerHTML = html;
+      initHeaderUser();
+    });
+    fetch('/footer.html').then(r => r.text()).then(html => { document.getElementById('footer-include').innerHTML = html; });
 
-  let map;
-  document.addEventListener("DOMContentLoaded", () => {
-    map = L.map('bongtra-map-container').setView([10.7769, 106.6602], 12);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(map);
+    let map;
+    document.addEventListener("DOMContentLoaded", () => {
+      map = L.map('bongtra-map-container').setView([10.7769, 106.6602], 12);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(map);
 
-    const bongTraIcon = L.divIcon({
-      className: 'custom-map-div-icon',
-      html: `<img src="/image/logo1.png" class="bongtra-map-marker-icon" onerror="this.src='/image/logo.png'">`,
-      iconSize: [38, 38], iconAnchor: [19, 19], popupAnchor: [0, -20]
+      const bongTraIcon = L.divIcon({
+        className: 'custom-map-div-icon',
+        html: `<img src="/image/logo1.png" class="bongtra-map-marker-icon" onerror="this.src='/image/logo.png'">`,
+        iconSize: [38, 38], iconAnchor: [19, 19], popupAnchor: [0, -20]
+      });
+
+      const stores = [
+        { name: "BÔNG TRÀ LŨY BÁN BÍCH", address: "389 Lũy Bán Bích, P. Hiệp Tân, Q. Tân Phú", lat: 10.7725, lng: 106.6385 },
+        { name: "BÔNG TRÀ BẦU CÁT", address: "77-79 Bầu Cát, P. Tân Bình", lat: 10.7938, lng: 106.6472 },
+        { name: "BÔNG TRÀ CỘNG HOÀ", address: "99D Cộng Hòa, Phường 4, Q. Tân Bình", lat: 10.8012, lng: 106.6578 },
+        { name: "BÔNG TRÀ PHẠM VIẾT CHÁNH", address: "100 Phạm Viết Chánh, Q.1", lat: 10.7681, lng: 106.6853 },
+        { name: "BÔNG TRÀ TRẦN HƯNG ĐẠO", address: "907 Trần Hưng Đạo, Phường 1, Q.5", lat: 10.7534, lng: 106.6741 }
+      ];
+
+      stores.forEach(s => {
+        L.marker([s.lat, s.lng], { icon: bongTraIcon })
+          .addTo(map)
+          .bindPopup(`<div style="font-family: sans-serif; padding: 3px;"><strong style="color: #006030; font-size: 13px;">${s.name}</strong><br><span style="font-size: 11px; color: #555;">📍 ${s.address}</span></div>`);
+      });
     });
 
-    const stores = [
-      { name: "BÔNG TRÀ LŨY BÁN BÍCH", address: "389 Lũy Bán Bích, P. Hiệp Tân, Q. Tân Phú", lat: 10.7725, lng: 106.6385 },
-      { name: "BÔNG TRÀ BẦU CÁT", address: "77-79 Bầu Cát, P. Tân Bình", lat: 10.7938, lng: 106.6472 },
-      { name: "BÔNG TRÀ CỘNG HOÀ", address: "99D Cộng Hòa, Phường 4, Q. Tân Bình", lat: 10.8012, lng: 106.6578 },
-      { name: "BÔNG TRÀ PHẠM VIẾT CHÁNH", address: "100 Phạm Viết Chánh, Q.1", lat: 10.7681, lng: 106.6853 },
-      { name: "BÔNG TRÀ TRẦN HƯNG ĐẠO", address: "907 Trần Hưng Đạo, Phường 1, Q.5", lat: 10.7534, lng: 106.6741 }
-    ];
-
-    stores.forEach(s => {
-      L.marker([s.lat, s.lng], { icon: bongTraIcon })
-        .addTo(map)
-        .bindPopup(`<div style="font-family: sans-serif; padding: 3px;"><strong style="color: #006030; font-size: 13px;">${s.name}</strong><br><span style="font-size: 11px; color: #555;">📍 ${s.address}</span></div>`);
-    });
-  });
-
-  function focusStore(lat, lng, name) {
-    if (map) {
-      map.flyTo([lat, lng], 15, { duration: 1.5 });
-      document.getElementById('bongtra-map-container').scrollIntoView({ behavior: 'smooth' });
+    function focusStore(lat, lng, name) {
+      if (map) {
+        map.flyTo([lat, lng], 15, { duration: 1.5 });
+        document.getElementById('bongtra-map-container').scrollIntoView({ behavior: 'smooth' });
+        showNotification(`Đang di chuyển đến bản đồ: ${name}`);
+      }
     }
-  }
-</script>
+  </script>
 </body>
 </html>
