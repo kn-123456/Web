@@ -26,7 +26,6 @@
       font-size: 24px;
       text-align: center;
     }
-    /* Thanh Tab lọc trạng thái đơn hàng */
     .order-tabs-wrapper {
       display: flex;
       background: #ffffff;
@@ -56,7 +55,6 @@
       color: #ffffff;
       box-shadow: 0 4px 10px rgba(0,96,48,0.2);
     }
-    /* Thẻ đơn hàng */
     .order-item-card {
       background: #ffffff;
       border-radius: 14px;
@@ -100,7 +98,6 @@
   <div class="container order-page-container">
     <h2 class="section-title">Đơn Mua Của Bạn</h2>
     
-    <!-- CÁC TAB LỌC TRẠNG THÁI ĐƠN HÀNG -->
     <div class="order-tabs-wrapper">
       <button class="order-tab-btn active" onclick="filterOrders('all', this)">Tất cả</button>
       <button class="order-tab-btn" onclick="filterOrders('Chờ xác nhận', this)">Chờ xác nhận</button>
@@ -110,13 +107,9 @@
       <button class="order-tab-btn" onclick="filterOrders('Đã hủy', this)">Đã hủy</button>
     </div>
 
-    <!-- DANH SÁCH ĐƠN HÀNG -->
-    <div id="orderListContainer">
-      <!-- Dữ liệu sẽ được render tự động bằng Javascript -->
-    </div>
+    <div id="orderListContainer"></div>
   </div>
 
-  <!-- MODAL XEM CHI TIẾT ĐƠN HÀNG -->
   <div class="modal fade" id="orderDetailModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
@@ -124,9 +117,7 @@
           <h5 class="modal-title fw-bold fs-6"><i class="fa-solid fa-file-invoice me-2"></i>Chi Tiết Đơn Hàng</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body p-4 bg-light" id="modalOrderDetailContent">
-          <!-- Nội dung chi tiết đơn hàng -->
-        </div>
+        <div class="modal-body p-4 bg-light" id="modalOrderDetailContent"></div>
         <div class="modal-footer bg-white py-2">
           <button type="button" class="btn btn-secondary btn-sm px-4 fw-bold" data-bs-dismiss="modal">Đóng</button>
         </div>
@@ -140,7 +131,6 @@
   <script>
     function logoutUser(e) {
       if (e) e.preventDefault();
-      // CHỈ XÓA PHIÊN ĐĂNG NHẬP, GIỮ NGUYÊN GIỎ HÀNG RIÊNG CỦA TỪNG USER
       localStorage.removeItem('currentUser');
       localStorage.removeItem('isVipMember');
       window.location.href = '/';
@@ -233,10 +223,18 @@
 
     let currentFilter = 'all';
 
+    function getOrdersKey() {
+      const loggedUser = localStorage.getItem('currentUser');
+      return loggedUser ? `bongtra_orders_${loggedUser}` : 'bongtra_orders';
+    }
+
     function renderOrders(filter = 'all') {
-      let orders = JSON.parse(localStorage.getItem('bongtra_orders')) || sampleOrders;
-      if (!localStorage.getItem('bongtra_orders')) {
-        localStorage.setItem('bongtra_orders', JSON.stringify(sampleOrders));
+      const ordersKey = getOrdersKey();
+      let orders = JSON.parse(localStorage.getItem(ordersKey));
+      
+      if (!orders) {
+        orders = sampleOrders;
+        localStorage.setItem(ordersKey, JSON.stringify(sampleOrders));
       }
 
       const container = document.getElementById('orderListContainer');
@@ -266,7 +264,7 @@
         else if (o.status === 'Đã hủy') badgeClass = 'status-da-huy';
 
         let firstItem = o.items[0];
-        let subTotal = o.items.reduce((s, item) => s + (item.price * item.qty), 0);
+        let subTotal = o.items.reduce((s, item) => s + (item.price * item.quantity || item.qty || 0), 0);
         let grandTotal = subTotal + (o.shippingFee || 0) - (o.discount || 0);
 
         return `
@@ -279,8 +277,8 @@
               <div class="d-flex align-items-center gap-3">
                 <img src="/image/logo1.png" alt="Logo" style="width: 50px; height: 50px; object-fit: contain; background: #f8f9fa; border-radius: 8px; padding: 5px;" onerror="this.src='/image/logo1.png'">
                 <div>
-                  <h6 class="fw-bold mb-1" style="font-size: 14px; color: #222;">${firstItem.name} ${o.items.length > 1 ? `và ${o.items.length - 1} sản phẩm khác` : ''}</h6>
-                  <p class="text-muted mb-0" style="font-size: 12px;">Cửa hàng: <strong class="text-dark">${o.storeName || 'Bông Trà'}</strong></p>
+                  <h6 class="fw-bold mb-1" style="font-size: 14px; color: #222;">${firstItem.title || firstItem.name} ${o.items.length > 1 ? `và ${o.items.length - 1} sản phẩm khác` : ''}</h6>
+                  <p class="text-muted mb-0" style="font-size: 12px;">Cửa hàng: <strong class="text-dark">${o.storeName || 'Bông Trà Lũy Bán Bích'}</strong></p>
                 </div>
               </div>
               <div class="text-end">
@@ -301,21 +299,21 @@
     }
 
     function openOrderDetail(order) {
-      let subTotal = order.items.reduce((s, item) => s + (item.price * item.qty), 0);
-      let ship = order.shippingFee || 15000;
+      let subTotal = order.items.reduce((s, item) => s + (item.price * (item.quantity || item.qty || 1)), 0);
+      let ship = order.shippingFee || 26000;
       let disc = order.discount || 0;
       let grandTotal = subTotal + ship - disc;
-      let points = order.pointsEarned || 10;
+      let points = order.pointsEarned || 12;
 
       let itemsHtml = order.items.map(item => `
         <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
           <div>
-            <h6 class="fw-bold mb-1 text-dark" style="font-size: 13.5px;">🔥 ${item.name}</h6>
-            <p class="text-muted mb-0" style="font-size: 11.5px;">${item.note || 'Không có ghi chú'}</p>
+            <h6 class="fw-bold mb-1 text-dark" style="font-size: 13.5px;">🔥 ${item.title || item.name}</h6>
+            <p class="text-muted mb-0" style="font-size: 11.5px;">${item.sweetness || ''} ${item.ice || ''} ${item.note || ''}</p>
           </div>
           <div class="text-end">
-            <span class="fw-bold text-dark" style="font-size: 13.5px;">${(item.price * item.qty).toLocaleString()}đ</span>
-            <span class="text-muted small d-block" style="font-size: 11px;">${item.qty}x</span>
+            <span class="fw-bold text-dark" style="font-size: 13.5px;">${(item.price * (item.quantity || item.qty || 1)).toLocaleString()}đ</span>
+            <span class="text-muted small d-block" style="font-size: 11px;">${item.quantity || item.qty || 1}x</span>
           </div>
         </div>
       `).join('');
@@ -324,20 +322,20 @@
         <div class="bg-white p-3 rounded-3 shadow-sm mb-3">
           <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style="font-size: 12px;">
             <span class="text-muted fw-bold">MÃ ĐẶT HÀNG</span>
-            <span class="fw-bold text-success font-monospace">${order.code || 'BT-99281'}</span>
+            <span class="fw-bold text-success font-monospace">${order.code || order.id}</span>
           </div>
           <div class="d-flex align-items-start gap-2 mb-2" style="font-size: 12.5px;">
             <i class="fa-solid fa-location-dot text-primary mt-1"></i>
             <div>
-              <strong class="text-dark">${order.storeName}</strong>
-              <div class="text-muted" style="font-size: 11.5px;">${order.address}</div>
+              <strong class="text-dark">${order.storeName || 'Bông Trà Lũy Bán Bích'}</strong>
+              <div class="text-muted" style="font-size: 11.5px;">389 Lũy Bán Bích, Phường Hiệp Tân, TP. Hồ Chí Minh</div>
             </div>
           </div>
           <div class="d-flex align-items-start gap-2" style="font-size: 12.5px;">
             <i class="fa-solid fa-map-pin text-danger mt-1"></i>
             <div>
               <strong class="text-dark">Địa chỉ nhận hàng của bạn</strong>
-              <div class="text-muted" style="font-size: 11.5px;">389 Lũy Bán Bích, Phường Phú Thạnh, Tân Phú, TP.HCM</div>
+              <div class="text-muted" style="font-size: 11.5px;">${order.address || '389 Lũy Bán Bích, Phường Hiệp Tân, TP. Hồ Chí Minh'}</div>
             </div>
           </div>
         </div>
@@ -352,7 +350,7 @@
               <span>${subTotal.toLocaleString()}đ</span>
             </div>
             <div class="d-flex justify-content-between mb-1 text-muted">
-              <span>Phí áp dụng (Vận chuyển)</span>
+              <span>Phí vận chuyển tiêu chuẩn</span>
               <span>${ship.toLocaleString()}đ</span>
             </div>
             ${disc > 0 ? `

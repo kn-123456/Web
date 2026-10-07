@@ -26,16 +26,15 @@
       padding: 0 15px;
     }
 
-    /* TOP HEADER BAR VỚI NÚT QUAY VỀ */
     .checkout-top-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
       margin-bottom: 25px;
       background: #ffffff;
-      padding: 15px 20px;
-      border-radius: 14px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+      padding: 16px 24px;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
       border: 1px solid #eaeaea;
     }
 
@@ -45,20 +44,22 @@
       gap: 8px;
       color: var(--main-green);
       font-weight: 700;
-      font-size: 13.5px;
+      font-size: 13px;
       text-decoration: none;
       background: #e8f5ed;
-      padding: 8px 16px;
-      border-radius: 8px;
-      transition: all 0.2s;
+      padding: 9px 18px;
+      border-radius: 10px;
+      transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+      border: 1px solid #d4ede0;
     }
 
     .btn-back-home:hover {
       background: var(--main-green);
       color: #ffffff;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 96, 48, 0.2);
     }
 
-    /* KHỐI THẺ THANH TOÁN */
     .checkout-card {
       background: #ffffff;
       border-radius: 16px;
@@ -85,12 +86,20 @@
       border: 1px solid #ddd;
       border-radius: 8px;
       padding: 12px 15px;
-      margin-bottom: 12px;
+      margin-bottom: 4px;
     }
 
     .form-control-custom:focus {
       border-color: var(--main-green);
       box-shadow: 0 0 0 0.2rem rgba(0, 96, 48, 0.15);
+    }
+
+    .error-feedback {
+      color: #dc3545;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      display: none;
     }
 
     .order-item-row {
@@ -129,7 +138,6 @@
       color: #ffffff;
     }
 
-    /* THANH TỔNG TIỀN CỐ ĐỊNH DƯỚI CÙNG */
     .checkout-bottom-bar {
       position: fixed;
       bottom: 0; left: 0; right: 0;
@@ -162,13 +170,34 @@
     .btn-submit-order:hover {
       background-color: #004d25;
     }
+
+    /* CUSTOM TOAST THÔNG BÁO ĐẶT HÀNG THÀNH CÔNG */
+    .custom-welcome-toast {
+      position: fixed; top: 85px; right: 25px; background: #ffffff; border-radius: 14px;
+      padding: 18px 24px; box-shadow: 0 12px 35px rgba(0,0,0,0.18); display: flex;
+      align-items: center; gap: 16px; z-index: 999999; transform: translateX(130%);
+      transition: transform 0.45s cubic-bezier(0.68, -0.55, 0.265, 1.55); border: 1px solid #eaeaea;
+    }
+    .custom-welcome-toast.show { transform: translateX(0); }
+    .toast-welcome-icon { width: 40px; height: 40px; background: #e8f5ed; color: var(--main-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .toast-text-title { font-size: 14.5px; font-weight: 700; color: #222222; margin-bottom: 2px; }
+    .toast-text-sub { font-size: 12.5px; color: #666666; margin-bottom: 0; }
   </style>
 </head>
 <body>
 
+  <!-- TOAST THÔNG BÁO THÀNH CÔNG -->
+  <div class="custom-welcome-toast" id="successToast">
+    <div class="toast-welcome-icon"><i class="fa-solid fa-circle-check"></i></div>
+    <div>
+      <div class="toast-text-title">Đặt đơn hàng thành công!</div>
+      <p class="toast-text-sub">Cảm ơn bạn đã ủng hộ Bông Trà.</p>
+    </div>
+  </div>
+
   <div class="checkout-wrapper">
     
-    <!-- TOP BAR VỚI NÚT QUAY VỀ TRANG CHỦ / MENU -->
+    <!-- TOP BAR VỚI NÚT QUAY VỀ -->
     <div class="checkout-top-bar">
       <div>
         <h3 class="fw-bold text-dark mb-1" style="font-size: 20px;">Xác Nhận Thanh Toán</h3>
@@ -183,8 +212,13 @@
       <div class="text-muted small mb-3">Thời gian giao hàng dự kiến: <strong class="text-success">25 - 30 phút (1.2 km)</strong></div>
       
       <input type="text" id="deliveryName" class="form-control form-control-custom" placeholder="Họ và tên người nhận">
+      <div class="error-feedback" id="errorName">Vui lòng nhập họ và tên người nhận.</div>
+
       <input type="text" id="deliveryPhone" class="form-control form-control-custom" placeholder="Số điện thoại nhận hàng">
-      <input type="text" id="deliveryAddress" class="form-control form-control-custom mb-0" value="389 Lũy Bán Bích, Phường Hiệp Tân, TP. Hồ Chí Minh" placeholder="Địa chỉ chi tiết">
+      <div class="error-feedback" id="errorPhone">Vui lòng nhập số điện thoại nhận hàng.</div>
+
+      <input type="text" id="deliveryAddress" class="form-control form-control-custom" value="389 Lũy Bán Bích, Phường Hiệp Tân, TP. Hồ Chí Minh" placeholder="Địa chỉ chi tiết">
+      <div class="error-feedback" id="errorAddress">Vui lòng nhập địa chỉ nhận hàng.</div>
     </div>
 
     <!-- 2. TÓM TẮT ĐƠN HÀNG -->
@@ -255,10 +289,6 @@
     const SHIPPING_FEE = 26000;
 
     window.addEventListener('DOMContentLoaded', () => {
-      const loggedUser = localStorage.getItem('currentUser');
-      if (loggedUser) {
-        document.getElementById('deliveryName').value = loggedUser;
-      }
       renderCheckoutSummary();
     });
 
@@ -348,6 +378,7 @@
     }
 
     function submitFinalOrder() {
+      const loggedUser = localStorage.getItem('currentUser');
       const cartKey = getCartKey();
       let cart = JSON.parse(localStorage.getItem(cartKey)) || [];
       if (cart.length === 0) {
@@ -355,32 +386,72 @@
         return;
       }
 
-      const name = document.getElementById('deliveryName').value.trim();
-      const phone = document.getElementById('deliveryPhone').value.trim();
-      const address = document.getElementById('deliveryAddress').value.trim();
+      const nameInput = document.getElementById('deliveryName');
+      const phoneInput = document.getElementById('deliveryPhone');
+      const addressInput = document.getElementById('deliveryAddress');
 
-      if (!name || !phone || !address) {
-        alert('Vui lòng điền đầy đủ họ tên, số điện thoại và địa chỉ nhận hàng!');
-        return;
+      const errorName = document.getElementById('errorName');
+      const errorPhone = document.getElementById('errorPhone');
+      const errorAddress = document.getElementById('errorAddress');
+
+      let hasError = false;
+
+      if (!nameInput.value.trim()) {
+        errorName.style.display = 'block';
+        nameInput.style.borderColor = '#dc3545';
+        hasError = true;
+      } else {
+        errorName.style.display = 'none';
+        nameInput.style.borderColor = '#ddd';
       }
 
-      let orders = JSON.parse(localStorage.getItem('bongtra_orders')) || [];
+      if (!phoneInput.value.trim()) {
+        errorPhone.style.display = 'block';
+        phoneInput.style.borderColor = '#dc3545';
+        hasError = true;
+      } else {
+        errorPhone.style.display = 'none';
+        phoneInput.style.borderColor = '#ddd';
+      }
+
+      if (!addressInput.value.trim()) {
+        errorAddress.style.display = 'block';
+        addressInput.style.borderColor = '#dc3545';
+        hasError = true;
+      } else {
+        errorAddress.style.display = 'none';
+        addressInput.style.borderColor = '#ddd';
+      }
+
+      if (hasError) return;
+
+      const ordersKey = loggedUser ? `bongtra_orders_${loggedUser}` : 'bongtra_orders';
+      let orders = JSON.parse(localStorage.getItem(ordersKey)) || [];
+
       const newOrder = {
         id: 'BT' + Math.floor(10000 + Math.random() * 90000),
+        code: 'A-' + Math.random().toString(36).substring(2, 15).toUpperCase(),
         date: new Date().toLocaleDateString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric' }),
         items: cart,
         total: document.getElementById('grandTotalText').innerText,
-        address: address,
-        status: 'Đang chuẩn bị'
+        storeName: 'Bông Trà Lũy Bán Bích',
+        address: addressInput.value.trim(),
+        shippingFee: SHIPPING_FEE,
+        discount: isPromoApplied ? 20000 : 0,
+        pointsEarned: 15,
+        status: 'Chờ xác nhận'
       };
-      orders.unshift(newOrder);
-      localStorage.setItem('bongtra_orders', JSON.stringify(orders));
 
-      // Xóa giỏ hàng riêng của user sau khi đặt đơn thành công
+      orders.unshift(newOrder);
+      localStorage.setItem(ordersKey, JSON.stringify(orders));
       localStorage.removeItem(cartKey);
 
-      alert('🎉 Đặt đơn hàng thành công! Cảm ơn bạn đã ủng hộ Bông Trà.');
-      window.location.href = '/don-mua';
+      // HIỂN THỊ TOAST THÔNG BÁO THÀNH CÔNG THAY CHO ALERT
+      document.getElementById('successToast').classList.add('show');
+
+      setTimeout(() => {
+        window.location.href = '/don-mua';
+      }, 1500);
     }
   </script>
 </body>
