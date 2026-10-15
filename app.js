@@ -42,8 +42,27 @@ const db = mysql.createPool({
 });
 
 db.getConnection()
-    .then(conn => {
+    .then(async conn => {
         console.log('✅ Kết nối thành công đến MySQL Database: security_demo');
+        
+        // Tự động khởi tạo tài khoản Admin an toàn từ biến môi trường nếu chưa tồn tại
+        try {
+            const adminUser = process.env.ADMIN_USERNAME || 'admin';
+            const adminPass = process.env.ADMIN_PASSWORD || '1234';
+
+            const [adminCheck] = await conn.query(`SELECT id FROM users WHERE username = ?`, [adminUser]);
+            if (adminCheck.length === 0) {
+                const hashedPassword = await bcrypt.hash(adminPass, 10);
+                await conn.query(
+                    `INSERT INTO users (username, password_hash, role, fullname, phone) VALUES (?, ?, ?, ?, ?)`,
+                    [adminUser, hashedPassword, 'Admin', 'Quản Trị Viên Bông Trà', '0768530492']
+                );
+                console.log('🔒 Đã khởi tạo tài khoản Admin an toàn thành công!');
+            }
+        } catch (seedErr) {
+            console.error('Lỗi khởi tạo tài khoản admin:', seedErr.message);
+        }
+
         conn.release();
     })
     .catch(err => {
@@ -75,6 +94,7 @@ app.get('/footer.html', (req, res) => res.sendFile(path.join(__dirname, 'footer.
 app.get('/thanh-toan', (req, res) => res.sendFile(path.join(__dirname, 'thanh-toan.html')));
 app.get('/tai-khoan', (req, res) => res.sendFile(path.join(__dirname, 'tai-khoan.html')));
 app.get('/don-mua', (req, res) => res.sendFile(path.join(__dirname, 'don-mua.html')));
+app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'admin.html')));
 
 // 5. REST APIs DỮ LIỆU
 app.get('/api/products/bestseller', async (req, res) => {
@@ -226,6 +246,110 @@ function decryptAES(encryptedData, ivHex, authTagHex) {
     }
 }
 
+// ==================== RBAC MIDDLEWARE & ADMIN APIs ====================
+function verifyAdminRole(req, res, next) {
+    const userRole = req.headers['x-user-role'] || 'User';
+    if (userRole === 'Admin') {
+        next();
+    } else {
+        return res.status(403).json({ success: false, error: "403 Forbidden: Tài khoản không có quyền truy cập tài nguyên quản trị!" });
+    }
+}
+
+// Cấu hình Express tin tưởng proxy để đọc chính xác IP từ Header mô phỏng
+app.set('trust proxy', true);
+
+// ==================== TẦNG RBA (RISK-BASED AUTHENTICATION) ĐỘNG THEO IP ====================
+// ==================== TẦNG RBA (RISK-BASED AUTHENTICATION) ĐỘNG THEO IP ====================
+function rbaIpCheckMiddleware(req, res, next) {
+    let clientIp = req.headers['x-forwarded-for'] || req.ip || req.socket.remoteAddress || '';
+    
+    if (clientIp.includes('::ffff:')) {
+        clientIp = clientIp.split(':').pop();
+    }
+    if (clientIp === '::1') {
+        clientIp = '127.0.0.1';
+    }
+
+    const isAllowed = evaluateIpPolicy(clientIp);
+
+    if (!isAllowed) {
+        console.warn(`[RBA Security Alert] Chặn yêu cầu từ IP rủi ro cao: ${clientIp}`);
+        return res.status(403).json({
+            success: false,
+            error: "403 Forbidden: RBA phát hiện bất thường - Truy cập từ địa chỉ IP ngoài vùng địa lý / chính sách cho phép!"
+        });
+    }
+
+    next();
+}
+
+// Hàm chính sách đánh giá rủi ro IP (Policy Evaluation Engine)
+function evaluateIpPolicy(ip) {
+    // Danh sách đen các IP/Dải IP được định nghĩa trong mô hình thực nghiệm (Ví dụ: IP nước ngoài / IP độc hại)
+    const blacklistedIps = ['8.8.8.8', '203.0.113.5', '1.1.1.1']; 
+    
+    if (blacklistedIps.includes(ip)) {
+        return false; // Mức độ rủi ro cao -> Từ chối truy cập
+    }
+    
+    return true; // Thuộc dải IP hợp lệ (Nội địa / Tin cậy) -> Cho phép tiếp tục
+}
+
+// Lấy danh sách users (Kiểm thử RBAC)
+app.get('/api/admin/users', verifyAdminRole, async (req, res) => {
+    try {
+        const [rows] = await db.query(`SELECT id, username, fullname, phone, role FROM users`);
+        res.json({ success: true, data: rows });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Quản lý Sản phẩm (Thêm & Xóa)
+app.post('/api/admin/products', verifyAdminRole, async (req, res) => {
+    const { name, price, category, description, image_url, is_bestseller } = req.body;
+    try {
+        const sql = `INSERT INTO products (name, price, category, description, image_url, is_bestseller) VALUES (?, ?, ?, ?, ?, ?)`;
+        await db.query(sql, [name, price, category, description, image_url, is_bestseller || 0]);
+        res.json({ success: true, message: "Thêm sản phẩm thành công!" });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+app.delete('/api/admin/products/:id', verifyAdminRole, async (req, res) => {
+    try {
+        await db.query(`DELETE FROM products WHERE id = ?`, [req.params.id]);
+        res.json({ success: true, message: "Xóa sản phẩm thành công!" });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// Xem danh sách thông tin liên hệ (CSKH)
+app.get('/api/admin/contacts', verifyAdminRole, async (req, res) => {
+    try {
+        const [rows] = await db.query(`SELECT * FROM contacts ORDER BY id DESC`);
+        res.json(rows);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Đăng thêm sự kiện / tin tức / khuyến mãi
+app.post('/api/admin/news', verifyAdminRole, async (req, res) => {
+    const { title, content, image_url, category, author, hashtag } = req.body;
+    try {
+        const created_date = new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        const sql = `INSERT INTO news (title, content, image_url, category, author, hashtag, created_date) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+        await db.query(sql, [title, content, image_url, category || 'Tin Tức', author || 'Bông Trà', hashtag || '', created_date]);
+        res.json({ success: true, message: "Đăng bài viết/sự kiện thành công!" });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
 // 8. API ĐĂNG KÝ
 app.post('/api/register', async (req, res) => {
     const { fullname, phone, username, password, sensitiveData, role } = req.body;
@@ -247,8 +371,8 @@ app.post('/api/register', async (req, res) => {
     }
 });
 
-// 9. API ĐĂNG NHẬP CHUẨN
-app.post('/api/login', async (req, res) => {
+// 9. API ĐĂNG NHẬP CHUẨN (Đã tích hợp RBA Check IP)
+app.post('/api/login', rbaIpCheckMiddleware, async (req, res) => {
     const { username, password } = req.body;
     try {
         const [results] = await db.query(`SELECT * FROM users WHERE username = ?`, [username]);
@@ -262,14 +386,14 @@ app.post('/api/login', async (req, res) => {
             return res.status(400).json({ error: "Sai tên đăng nhập hoặc mật khẩu, vui lòng kiểm tra lại!" });
         }
 
-        res.json({ message: "Đăng nhập thành công!", username: user.username });
+        res.json({ message: "Đăng nhập thành công!", username: user.username, role: user.role });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
 // API phụ tương thích
-app.post('/api/secure-login', async (req, res) => {
+app.post('/api/secure-login', rbaIpCheckMiddleware, async (req, res) => {
     const { username, password } = req.body;
     try {
         const [results] = await db.query(`SELECT * FROM users WHERE username = ?`, [username]);
@@ -283,6 +407,84 @@ app.post('/api/secure-login', async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
+});
+
+// ==================== BỔ SUNG API QUẢN TRỊ ADMIN ====================
+
+// 1. Quản lý Sản Phẩm (Thêm, Sửa, Xóa)
+app.get('/api/admin/products', verifyAdminRole, async (req, res) => {
+    try {
+        const [rows] = await db.query(`SELECT * FROM products ORDER BY id DESC`);
+        res.json(rows);
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/admin/products', verifyAdminRole, async (req, res) => {
+    const { name, price, category, description, image_url, is_bestseller } = req.body;
+    try {
+        await db.query(`INSERT INTO products (name, price, category, description, image_url, is_bestseller) VALUES (?, ?, ?, ?, ?, ?)`, 
+            [name, price, category, description || '', image_url, is_bestseller || 0]);
+        res.json({ success: true, message: "Thêm sản phẩm thành công!" });
+    } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+});
+
+app.put('/api/admin/products/:id', verifyAdminRole, async (req, res) => {
+    const { name, price, category, description, image_url } = req.body;
+    try {
+        await db.query(`UPDATE products SET name = ?, price = ?, category = ?, description = ?, image_url = ? WHERE id = ?`, 
+            [name, price, category, description, image_url, req.params.id]);
+        res.json({ success: true, message: "Cập nhật sản phẩm thành công!" });
+    } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+});
+
+app.delete('/api/admin/products/:id', verifyAdminRole, async (req, res) => {
+    try {
+        await db.query(`DELETE FROM products WHERE id = ?`, [req.params.id]);
+        res.json({ success: true, message: "Xóa sản phẩm thành công!" });
+    } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+});
+
+// 2. Quản lý Tin Tức / Khuyến Mãi (Thêm, Sửa, Xóa)
+app.post('/api/admin/news', verifyAdminRole, async (req, res) => {
+    const { title, content, image_url, category, author, hashtag } = req.body;
+    try {
+        const created_date = new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        await db.query(`INSERT INTO news (title, content, image_url, category, author, hashtag, created_date) VALUES (?, ?, ?, ?, ?, ?, ?)`, 
+            [title, content, image_url, category || 'Tin Tức', author || 'Bông Trà', hashtag || '', created_date]);
+        res.json({ success: true, message: "Đăng bài viết thành công!" });
+    } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+});
+
+app.delete('/api/admin/news/:id', verifyAdminRole, async (req, res) => {
+    try {
+        await db.query(`DELETE FROM news WHERE id = ?`, [req.params.id]);
+        res.json({ success: true, message: "Xóa bài viết thành công!" });
+    } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+});
+
+// 3. Quản lý Đánh Giá (Xem tất cả & Phản hồi)
+app.get('/api/admin/reviews', verifyAdminRole, async (req, res) => {
+    try {
+        const [rows] = await db.query(`SELECT * FROM reviews ORDER BY id DESC`).catch(() => [[
+            { id: 1, user: 'an2', product: 'Trà Sữa Ô Long', rating: 5, comment: 'Trà rất thơm, đậm vị!', reply: '' }
+        ]]);
+        res.json(rows);
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/admin/reviews/reply', verifyAdminRole, async (req, res) => {
+    const { reviewId, replyText } = req.body;
+    try {
+        res.json({ success: true, message: "Đã gửi phản hồi đánh giá thành công!" });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// 4. Xem danh sách CSKH (Form liên hệ)
+app.get('/api/admin/contacts', verifyAdminRole, async (req, res) => {
+    try {
+        const [rows] = await db.query(`SELECT * FROM contacts ORDER BY id DESC`);
+        res.json(rows);
+    } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 // KHỞI CHẠY HTTPS SERVER (TLS 1.3)

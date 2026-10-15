@@ -119,6 +119,11 @@
         if (res.ok) {
           errorMsg.style.display = 'none';
           localStorage.setItem('currentUser', username);
+          
+          // LƯU LẠI VAI TRÒ (ROLE) ĐỂ PHÂN QUYỀN
+          if (data.role) {
+            localStorage.setItem('userRole', data.role);
+          }
 
           // Đảm bảo user đăng nhập có giỏ hàng riêng, nếu chưa có thì tạo mới trống hoàn toàn
           if (!localStorage.getItem(`cartList_${username}`)) {
@@ -133,10 +138,22 @@
           document.getElementById('welcomeToast').classList.add('show');
 
           setTimeout(() => {
-            window.location.href = '/';
+            // NẾU LÀ TÀI KHOẢN ADMIN THÌ ĐIỀU HƯỚNG THẲNG VÀO TRANG QUẢN TRỊ RIÊNG
+            if (data.role === 'Admin') {
+              window.location.href = '/admin';
+            } else {
+              window.location.href = '/';
+            }
           }, 1500);
         } else {
-          errorMsg.innerText = data.message || data.error || 'Sai tên đăng nhập hoặc mật khẩu, vui lòng kiểm tra lại!';
+          // Xử lý hiển thị chi tiết thông báo lỗi từ Server (bao gồm cả lỗi 403 RBA chặn IP hoặc 401/400)
+          let displayError = data.error || data.message || 'Sai tên đăng nhập hoặc mật khẩu, vui lòng kiểm tra lại!';
+          
+          if (res.status === 403) {
+            displayError = "⚠️ " + displayError; // Nổi bật cảnh báo bảo mật RBA
+          }
+
+          errorMsg.innerText = displayError;
           errorMsg.style.display = 'block';
         }
       } catch (err) {

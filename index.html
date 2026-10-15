@@ -493,23 +493,52 @@
 
     function initHeaderUser() {
       const loggedUser = localStorage.getItem('currentUser');
+      const userRole = localStorage.getItem('userRole') || 'User';
       const authArea = document.getElementById('authArea');
+      
+      let displayName = loggedUser || '';
+      if (userRole === 'Admin') {
+        displayName += ' 🛡️';
+      }
+
       if (loggedUser && authArea) {
-        authArea.innerHTML = `
-          <div class="user-dropdown-wrapper" style="position:relative; display:flex; align-items:center; cursor:pointer;">
-            <img src="/image/icon_toi.png" alt="Tôi" style="width:32px; height:32px; border-radius:50%; object-fit:cover; border:1.5px solid #fff;" onerror="this.src='/image/logo1.png'">
-            <span style="color:#fff; font-size:13px; font-weight:700; margin-left:8px;">${loggedUser}</span>
-            <div class="user-dropdown-content" style="display:none; position:absolute; right:0; top:60px; background:#fff; min-width:180px; box-shadow:0 8px 24px rgba(0,0,0,0.18); border-radius:8px; overflow:hidden; z-index:99999;">
-              <a href="/tai-khoan" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Tài Khoản Của Tôi</a>
-              <a href="/don-mua" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Đơn Mua</a>
-              <a href="#" onclick="logoutUser(event)" style="color:#dc3545; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Đăng Xuất</a>
+        if (userRole === 'Admin') {
+          // HIỂN THỊ GIAO DIỆN ADMIN CHUẨN XÁC NHƯ ẢNH 1 Ở TRANG CHỦ
+          authArea.innerHTML = `
+            <div class="user-dropdown-wrapper" style="position:relative; display:flex; align-items:center; cursor:pointer; height:60px;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <img src="/image/icon_toi.png" alt="Admin" style="width:30px; height:30px; border-radius:50%; object-fit:cover; border:1.5px solid #fff;" onerror="this.src='/image/logo1.png'">
+                <span style="color:#fff; font-size:12px; font-weight:800; text-transform:uppercase;">${displayName}</span>
+              </div>
+              <div class="user-dropdown-content" style="display:none; position:absolute; right:0; top:60px; background:#fff; min-width:200px; box-shadow:0 8px 24px rgba(0,0,0,0.18); border-radius:8px; overflow:hidden; z-index:99999; border:1px solid #eaeaea;">
+                <a href="/admin" style="color:#006030; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:700; background:#e8f5ed;"><i class="fa-solid fa-gauge-high me-2"></i>Quản Trị Hệ Thống</a>
+                <a href="#" onclick="logoutUser(event)" style="color:#dc3545; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;"><i class="fa-solid fa-right-from-bracket me-2"></i>Đăng Xuất</a>
+              </div>
             </div>
-          </div>
-        `;
+          `;
+        } else {
+          // Giao diện user bình thường
+          authArea.innerHTML = `
+            <div class="user-dropdown-wrapper" style="position:relative; display:flex; align-items:center; cursor:pointer; height:60px;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <img src="/image/icon_toi.png" alt="Tôi" style="width:30px; height:30px; border-radius:50%; object-fit:cover; border:1.5px solid #fff;" onerror="this.src='/image/logo1.png'">
+                <span style="color:#fff; font-size:12px; font-weight:800; text-transform:uppercase;">${displayName}</span>
+              </div>
+              <div class="user-dropdown-content" style="display:none; position:absolute; right:0; top:60px; background:#fff; min-width:180px; box-shadow:0 8px 24px rgba(0,0,0,0.18); border-radius:8px; overflow:hidden; z-index:99999; border:1px solid #eaeaea;">
+                <a href="/tai-khoan" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Tài Khoản Của Tôi</a>
+                <a href="/don-mua" style="color:#333; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Đơn Mua</a>
+                <a href="#" onclick="logoutUser(event)" style="color:#dc3545; padding:12px 18px; text-decoration:none; display:block; font-size:13.5px; font-weight:600;">Đăng Xuất</a>
+              </div>
+            </div>
+          `;
+        }
+
         const wrap = authArea.querySelector('.user-dropdown-wrapper');
         const cont = authArea.querySelector('.user-dropdown-content');
-        wrap.addEventListener('mouseenter', () => cont.style.display = 'block');
-        wrap.addEventListener('mouseleave', () => cont.style.display = 'none');
+        if(wrap && cont) {
+          wrap.addEventListener('mouseenter', () => cont.style.display = 'block');
+          wrap.addEventListener('mouseleave', () => cont.style.display = 'none');
+        }
       } else if (authArea) {
         authArea.innerHTML = `<a href="/login" class="btn-header-login">ĐĂNG NHẬP</a>`;
       }
@@ -519,11 +548,12 @@
 
     function logoutUser(e) {
       if (e) e.preventDefault();
-      // CHỈ XÓA PHIÊN ĐĂNG NHẬP, GIỮ NGUYÊN GIỎ HÀNG CỦA TỪNG USER
       localStorage.removeItem('currentUser');
       localStorage.removeItem('isVipMember');
+      localStorage.removeItem('userRole');
       window.location.href = '/';
     }
+
 
     let allToppingsData = [];
     window.addEventListener('DOMContentLoaded', async () => {
