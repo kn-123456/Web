@@ -39,6 +39,7 @@
     .menu-item-left { display: flex; align-items: center; gap: 14px; font-size: 14px; font-weight: 600; }
     .menu-item-left i { color: var(--main-green); font-size: 18px; width: 24px; text-align: center; }
     .badge-sub { background-color: #ffebee; color: #c62828; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; margin-left: 6px; }
+    .error-feedback-text { color: #dc3545; font-size: 12px; margin-top: 4px; display: none; font-weight: 600; }
   </style>
 </head>
 <body>
@@ -94,10 +95,25 @@
       </a>
     </div>
 
-    <!-- KHỐI TỔNG QUÁT -->
+    <!-- KHỐI TỔNG QUÁT & QUẢN LÝ TÀI KHOẢN -->
     <div class="menu-group-card">
-      <div class="p-3 pb-2 text-muted fw-bold" style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; background: #fafafa; border-bottom: 1px solid #eaeaea;">Tổng quát</div>
+      <div class="p-3 pb-2 text-muted fw-bold" style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; background: #fafafa; border-bottom: 1px solid #eaeaea;">Tổng quát & Quản lý tài khoản</div>
       
+      <a href="javascript:void(0)" onclick="openUpdateProfileModal()" class="menu-item-row">
+        <div class="menu-item-left"><i class="fa-solid fa-user-pen"></i><span>Cập Nhật Thông Tin Cá Nhân</span></div>
+        <i class="fa-solid fa-chevron-right text-muted" style="font-size: 12px;"></i>
+      </a>
+
+      <a href="javascript:void(0)" onclick="openChangePasswordModal()" class="menu-item-row">
+        <div class="menu-item-left"><i class="fa-solid fa-key"></i><span>Đổi Mật Khẩu</span></div>
+        <i class="fa-solid fa-chevron-right text-muted" style="font-size: 12px;"></i>
+      </a>
+
+      <a href="javascript:void(0)" onclick="requestDeleteAccountData()" class="menu-item-row text-danger">
+        <div class="menu-item-left text-danger"><i class="fa-solid fa-user-slash text-danger"></i><span>Yêu Cầu Xóa Dữ Liệu Cá Nhân</span></div>
+        <i class="fa-solid fa-chevron-right text-muted" style="font-size: 12px;"></i>
+      </a>
+
       <a href="/cua-hang" class="menu-item-row">
         <div class="menu-item-left"><i class="fa-solid fa-store"></i><span>Cửa hàng Bông Trà gần bạn</span></div>
         <i class="fa-solid fa-chevron-right text-muted" style="font-size: 12px;"></i>
@@ -188,10 +204,78 @@
     </div>
   </div>
 
+  <!-- MODAL 4: CẬP NHẬT THÔNG TIN CÁ NHÂN (Có placeholder hướng dẫn) -->
+  <div class="modal fade" id="updateProfileModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg rounded-4 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold text-success mb-0"><i class="fa-solid fa-user-pen me-2"></i>Cập Nhật Thông Tin Cá Nhân</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form id="updateProfileForm">
+          <div class="mb-3">
+            <label class="form-label small fw-bold">Họ và tên</label>
+            <input type="text" id="updateFullname" class="form-control" placeholder="Nhập họ và tên mới của bạn..." required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-bold">Số điện thoại</label>
+            <input type="tel" id="updatePhone" class="form-control" placeholder="Nhập số điện thoại mới (10-11 chữ số)..." required>
+          </div>
+          <button type="submit" class="btn btn-success w-100 fw-bold py-2">Lưu Thay Đổi</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 5: ĐỔI MẬT KHẨU (Có nhập mật khẩu mới, xác nhận lại & thông báo lỗi màu đỏ) -->
+  <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg rounded-4 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold text-success mb-0"><i class="fa-solid fa-key me-2"></i>Đổi Mật Khẩu</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form id="changePasswordForm">
+          <div class="mb-3">
+            <label class="form-label small fw-bold">Mật khẩu hiện tại</label>
+            <input type="password" id="oldPassword" class="form-control" placeholder="Nhập mật khẩu cũ" required>
+            <div class="error-feedback-text" id="oldPassErrorMsg"><i class="fa-solid fa-triangle-exclamation me-1"></i>Mật khẩu hiện tại không chính xác!</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-bold">Mật khẩu mới</label>
+            <input type="password" id="newPassword" class="form-control" placeholder="Nhập mật khẩu mới" required>
+            <div class="error-feedback-text" id="newPassErrorMsg"><i class="fa-solid fa-triangle-exclamation me-1"></i>Mật khẩu mới không được giống mật khẩu cũ!</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-bold">Xác nhận mật khẩu mới</label>
+            <input type="password" id="confirmNewPassword" class="form-control" placeholder="Nhập lại mật khẩu mới" required>
+            <div class="error-feedback-text" id="confirmPassErrorMsg"><i class="fa-solid fa-triangle-exclamation me-1"></i>Mật khẩu mới nhập lại không khớp!</div>
+          </div>
+          <button type="submit" class="btn btn-success w-100 fw-bold py-2">Xác Nhận Đổi Mật Khẩu</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL XÁC NHẬN XÓA DỮ LIỆU CÁ NHÂN -->
+  <div class="modal fade" id="deleteDataConfirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg rounded-4 p-4 text-center">
+        <div class="text-danger mb-2" style="font-size: 40px;"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <h5 class="fw-bold text-dark mb-2">Cảnh Báo Bảo Mật</h5>
+        <p class="text-muted small mb-4">Bạn có chắc chắn muốn gửi yêu cầu xóa vĩnh viễn toàn bộ dữ liệu cá nhân và tài khoản khỏi hệ thống theo quy định quyền được quên? Hành động này không thể hoàn tác!</p>
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-secondary w-50 fw-bold py-2" data-bs-dismiss="modal">Hủy</button>
+          <button type="button" class="btn btn-danger w-50 fw-bold py-2" onclick="executeDeleteAccountData()">Xác Nhận Xóa</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- TOAST THÔNG BÁO -->
   <div id="customToast" class="toast align-items-center text-white bg-success border-0 position-fixed bottom-0 end-0 m-4 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true" style="z-index: 99999; border-radius: 12px;">
     <div class="d-flex">
-      <div class="toast-body fw-bold" id="toastMessage">Đăng ký hội viên VIP thành công!</div>
+      <div class="toast-body fw-bold" id="toastMessage">Thành công!</div>
       <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
     </div>
   </div>
@@ -260,7 +344,6 @@
 
     function logoutUser(e) {
       if (e) e.preventDefault();
-      // CHỈ XÓA PHIÊN ĐĂNG NHẬP, GIỮ NGUYÊN GIỎ HÀNG RIÊNG CỦA TỪNG USER TRONG LOCALSTORAGE
       localStorage.removeItem('currentUser');
       localStorage.removeItem('isVipMember');
       window.location.href = '/';
@@ -354,6 +437,129 @@
 
     function openVipModal() {
       new bootstrap.Modal(document.getElementById('vipModal')).show();
+    }
+
+    // --- CÁC HÀM XỬ LÝ QUẢN LÝ TÀI KHOẢN ---
+    function openUpdateProfileModal() {
+      const currentName = document.getElementById('userNameDisplay').innerText;
+      document.getElementById('updateFullname').value = currentName !== 'Khách' ? currentName.replace(' 👑', '') : '';
+      document.getElementById('updatePhone').value = '';
+      new bootstrap.Modal(document.getElementById('updateProfileModal')).show();
+    }
+
+    function openChangePasswordModal() {
+      document.getElementById('changePasswordForm').reset();
+      document.getElementById('oldPassErrorMsg').style.display = 'none';
+      document.getElementById('newPassErrorMsg').style.display = 'none';
+      document.getElementById('confirmPassErrorMsg').style.display = 'none';
+      new bootstrap.Modal(document.getElementById('changePasswordModal')).show();
+    }
+
+    // Xử lý submit Cập nhật thông tin
+    document.getElementById('updateProfileForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = localStorage.getItem('currentUser');
+      const fullname = document.getElementById('updateFullname').value.trim();
+      const phone = document.getElementById('updatePhone').value.trim();
+
+      try {
+        const res = await fetch('/api/user/update', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, fullname, phone })
+        });
+        const result = await res.json();
+        if (result.success) {
+          showNotification('✅ ' + result.message);
+          document.getElementById('userNameDisplay').innerText = fullname;
+          bootstrap.Modal.getInstance(document.getElementById('updateProfileModal')).hide();
+        } else {
+          alert('Lỗi: ' + result.error);
+        }
+      } catch (err) {
+        alert('Lỗi kết nối server!');
+      }
+    });
+
+    // Xử lý submit Đổi mật khẩu (Kiểm tra trùng mật khẩu cũ, khớp mật khẩu mới & hiển thị thông báo lỗi màu đỏ)
+    document.getElementById('changePasswordForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = localStorage.getItem('currentUser');
+      const oldPassword = document.getElementById('oldPassword').value;
+      const newPassword = document.getElementById('newPassword').value;
+      const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+
+      const oldPassErrorMsg = document.getElementById('oldPassErrorMsg');
+      const newPassErrorMsg = document.getElementById('newPassErrorMsg');
+      const confirmPassErrorMsg = document.getElementById('confirmPassErrorMsg');
+
+      let hasError = false;
+
+      // Kiểm tra nếu mật khẩu mới trùng với mật khẩu cũ
+      if (newPassword === oldPassword) {
+        newPassErrorMsg.style.display = 'block';
+        hasError = true;
+      } else {
+        newPassErrorMsg.style.display = 'none';
+      }
+
+      // Kiểm tra xác nhận mật khẩu mới có khớp không
+      if (newPassword !== confirmNewPassword) {
+        confirmPassErrorMsg.style.display = 'block';
+        hasError = true;
+      } else {
+        confirmPassErrorMsg.style.display = 'none';
+      }
+
+      if (hasError) return;
+
+      try {
+        const res = await fetch('/api/user/change-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, oldPassword, newPassword })
+        });
+        const result = await res.json();
+        if (result.success) {
+          oldPassErrorMsg.style.display = 'none';
+          showNotification('✅ ' + result.message);
+          bootstrap.Modal.getInstance(document.getElementById('changePasswordModal')).hide();
+        } else {
+          // Hiển thị lỗi màu đỏ với dấu chấm than dưới ô mật khẩu hiện tại nếu mật khẩu cũ không đúng
+          oldPassErrorMsg.innerText = "⚠️ " + (result.error || "Mật khẩu hiện tại không chính xác!");
+          oldPassErrorMsg.style.display = 'block';
+        }
+      } catch (err) {
+        oldPassErrorMsg.innerText = "⚠️ Lỗi kết nối server!";
+        oldPassErrorMsg.style.display = 'block';
+      }
+    });
+
+    // Yêu cầu xóa dữ liệu cá nhân (Hiển thị Modal cảnh báo thay vì dùng confirm() của trình duyệt)
+    function requestDeleteAccountData() {
+      new bootstrap.Modal(document.getElementById('deleteDataConfirmModal')).show();
+    }
+
+    async function executeDeleteAccountData() {
+      const username = localStorage.getItem('currentUser');
+      try {
+        const res = await fetch('/api/user/delete-data', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username })
+        });
+        const result = await res.json();
+        if (result.success) {
+          bootstrap.Modal.getInstance(document.getElementById('deleteDataConfirmModal')).hide();
+          showNotification('✅ ' + result.message);
+          localStorage.clear();
+          setTimeout(() => { window.location.href = '/'; }, 1500);
+        } else {
+          alert('Lỗi: ' + result.error);
+        }
+      } catch (err) {
+        alert('Lỗi kết nối server!');
+      }
     }
   </script>
 </body>

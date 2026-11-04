@@ -530,6 +530,50 @@ app.get('/api/admin/contacts', verifyAdminRole, async (req, res) => {
         res.json(rows);
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
+// ==================== BỔ SUNG API QUẢN LÝ TÀI KHOẢN & QUYỀN ĐƯỢC QUÊN ====================
+
+// 1. API Cập nhật thông tin cá nhân
+app.put('/api/user/update', async (req, res) => {
+    const { username, fullname, phone } = req.body;
+    try {
+        await db.query(`UPDATE users SET fullname = ?, phone = ? WHERE username = ?`, [fullname, phone, username]);
+        res.json({ success: true, message: "Cập nhật thông tin thành công!" });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// 2. API Đổi mật khẩu an toàn
+app.post('/api/user/change-password', async (req, res) => {
+    const { username, oldPassword, newPassword } = req.body;
+    try {
+        const [results] = await db.query(`SELECT * FROM users WHERE username = ?`, [username]);
+        if (results.length === 0) return res.status(404).json({ success: false, error: "Không tìm thấy người dùng!" });
+        
+        const user = results[0];
+        const isMatch = await bcrypt.compare(oldPassword, user.password_hash);
+        if (!isMatch) return res.status(400).json({ success: false, error: "Mật khẩu hiện tại không chính xác!" });
+
+        const hashedNewPass = await bcrypt.hash(newPassword, 10);
+        await db.query(`UPDATE users SET password_hash = ? WHERE username = ?`, [hashedNewPass, username]);
+        
+        res.json({ success: true, message: "Đổi mật khẩu thành công!" });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// 3. API Yêu cầu xóa dữ liệu cá nhân (Quyền được quên / Right to be forgotten)
+app.delete('/api/user/delete-data', async (req, res) => {
+    const { username } = req.body;
+    try {
+        // Thực hiện xóa dữ liệu người dùng khỏi bảng users
+        await db.query(`DELETE FROM users WHERE username = ?`, [username]);
+        res.json({ success: true, message: "Đã xóa toàn bộ dữ liệu cá nhân theo yêu cầu thành công." });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
 
 // KHỞI CHẠY HTTP SERVER 
 app.listen(PORT, () => {
