@@ -8,11 +8,12 @@ const crypto = require('crypto');
 const path = require('path');
 const https = require('https');
 const fs = require('fs');
+const geoip = require('geoip-lite'); // [BỔ SUNG BLOCK 2] Thư viện tra cứu vị trí địa lý theo IP (GeoIP-Lite)
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const HTTPS_PORT = process.env.HTTPS_PORT || 8443;
-
+const http = require('http');
 // Cấu hình SSL/TLS 1.3 Options
 const options = {
     key: fs.readFileSync('server.key'),
@@ -75,6 +76,38 @@ const transporter = nodemailer.createTransport({
     auth: {
         user: 'kimmngann10102005@gmail.com',
         pass: 'ymlmoubxcmqfnzln'
+    }
+});
+
+// ==================== THỰC NGHIỆM SQL INJECTION & BẢO MẬT ====================
+
+// 1. Nhánh không an toàn (String Concatenation) - Minh chứng lỗ hổng SQLi
+app.get('/api/unsafe-search', async (req, res) => {
+    const productName = req.query.name || '';
+    try {
+        const query = `SELECT * FROM products WHERE name LIKE '%${productName}%'`;
+        const [rows] = await db.query(query);
+        res.json({ success: true, count: rows.length, data: rows });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// 2. Nhánh an toàn (Prepared Statement) + Tích hợp xử lý lỗi an toàn (Bước 6)
+app.get('/api/safe-search', async (req, res) => {
+    const productName = req.query.name || '';
+    try {
+        const query = `SELECT * FROM products WHERE name LIKE ?`;
+        const [rows] = await db.query(query, [`%${productName}%`]);
+        res.json({ success: true, count: rows.length, data: rows });
+    } catch (err) {
+        // Ghi log chi tiết phục vụ quản trị viên phía server (Ẩn khỏi client)
+        console.error('[Database Error Log]:', err.message); 
+        // Phản hồi đã làm sạch cho client, ngăn chặn Error-based SQL Injection
+        res.status(500).json({ 
+            success: false, 
+            error: "Đã xảy ra lỗi hệ thống, vui lòng thử lại sau." 
+        });
     }
 });
 
@@ -259,41 +292,52 @@ function verifyAdminRole(req, res, next) {
 // Cấu hình Express tin tưởng proxy để đọc chính xác IP từ Header mô phỏng
 app.set('trust proxy', true);
 
-// ==================== TẦNG RBA (RISK-BASED AUTHENTICATION) ĐỘNG THEO IP ====================
-// ==================== TẦNG RBA (RISK-BASED AUTHENTICATION) ĐỘNG THEO IP ====================
+
+// ==================== TẦNG RBA (RISK-BASED AUTHENTICATION) & GEOIP-LITE ====================
 function rbaIpCheckMiddleware(req, res, next) {
     let clientIp = req.headers['x-forwarded-for'] || req.ip || req.socket.remoteAddress || '';
     
     if (clientIp.includes('::ffff:')) {
         clientIp = clientIp.split(':').pop();
     }
-    if (clientIp === '::1') {
-        clientIp = '127.0.0.1';
+    // [BỔ SUNG BLOCK 2] Nếu chạy local (loopback), mô phỏng IP quốc tế hoặc IP bị chặn để test GeoIP-Lite
+    if (clientIp === '::1' || clientIp === '127.0.0.1') {
+        clientIp = '8.8.8.8'; // Mặc định test IP mẫu (hoặc thay đổi IP tùy ý để kiểm thử block)
     }
 
     const isAllowed = evaluateIpPolicy(clientIp);
 
     if (!isAllowed) {
-        console.warn(`[RBA Security Alert] Chặn yêu cầu từ IP rủi ro cao: ${clientIp}`);
+        console.warn(`[RBA / GeoIP Security Alert] Chặn yêu cầu từ IP rủi ro cao / vị trí bị hạn chế: ${clientIp}`);
         return res.status(403).json({
             success: false,
-            error: "403 Forbidden: RBA phát hiện bất thường - Truy cập từ địa chỉ IP ngoài vùng địa lý / chính sách cho phép!"
+            error: "403 Forbidden: RBA & GeoIP phát hiện bất thường - Truy cập từ địa chỉ IP hoặc quốc gia nằm trong danh sách chặn!"
         });
     }
 
     next();
 }
 
-// Hàm chính sách đánh giá rủi ro IP (Policy Evaluation Engine)
+// Hàm chính sách đánh giá rủi ro IP kết hợp GeoIP-Lite (Policy Evaluation Engine)
 function evaluateIpPolicy(ip) {
-    // Danh sách đen các IP/Dải IP được định nghĩa trong mô hình thực nghiệm (Ví dụ: IP nước ngoài / IP độc hại)
-    const blacklistedIps = ['8.8.8.8', '203.0.113.5', '1.1.1.1']; 
+    // [BỔ SUNG BLOCK 2] Sử dụng geoip-lite tra cứu thông tin quốc gia dựa trên IP
+    const geo = geoip.lookup(ip);
     
+    // Danh sách các mã quốc gia bị hạn chế / chặn truy cập theo chính sách bảo mật (Ví dụ: 'CN', 'XX', ...)
+    const blockedCountries = ['CN']; 
+    
+    if (geo && blockedCountries.includes(geo.country)) {
+        console.log(`[GeoIP-Lite] Chặn IP ${ip} thuộc quốc gia: ${geo.country}`);
+        return false; // Thuộc quốc gia bị chặn -> Từ chối
+    }
+
+    // Danh sách đen các IP độc hại cụ thể
+    const blacklistedIps = ['203.0.113.5', '1.1.1.1']; 
     if (blacklistedIps.includes(ip)) {
         return false; // Mức độ rủi ro cao -> Từ chối truy cập
     }
     
-    return true; // Thuộc dải IP hợp lệ (Nội địa / Tin cậy) -> Cho phép tiếp tục
+    return true; // Hợp lệ -> Cho phép tiếp tục
 }
 
 // Lấy danh sách users (Kiểm thử RBAC)
@@ -459,7 +503,7 @@ app.delete('/api/admin/news/:id', verifyAdminRole, async (req, res) => {
     try {
         await db.query(`DELETE FROM news WHERE id = ?`, [req.params.id]);
         res.json({ success: true, message: "Xóa bài viết thành công!" });
-    } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+    } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 // 3. Quản lý Đánh Giá (Xem tất cả & Phản hồi)
@@ -485,6 +529,13 @@ app.get('/api/admin/contacts', verifyAdminRole, async (req, res) => {
         const [rows] = await db.query(`SELECT * FROM contacts ORDER BY id DESC`);
         res.json(rows);
     } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// KHỞI CHẠY HTTP SERVER 
+app.listen(PORT, () => {
+    console.log(`================================================`);
+    console.log(`⚠️ Insecure Server (HTTP) đang chạy tại: http://localhost:${PORT}`);
+    console.log(`================================================`);
 });
 
 // KHỞI CHẠY HTTPS SERVER (TLS 1.3)
