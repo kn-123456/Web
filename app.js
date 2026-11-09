@@ -8,49 +8,44 @@ const crypto = require('crypto');
 const path = require('path');
 const https = require('https');
 const fs = require('fs');
-const geoip = require('geoip-lite'); // [BỔ SUNG BLOCK 2] Thư viện tra cứu vị trí địa lý theo IP (GeoIP-Lite)
+const geoip = require('geoip-lite');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 const HTTPS_PORT = process.env.HTTPS_PORT || 8443;
-const http = require('http');
-// Cấu hình SSL/TLS 1.3 Options
+
+// Cấu hình SSL/TLS 1.3
 const options = {
     key: fs.readFileSync('server.key'),
     cert: fs.readFileSync('server.crt'),
-    minVersion: 'TLSv1.3' // Ép buộc sử dụng TLS 1.3
+    minVersion: 'TLSv1.3'
 };
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// 1. Phục vụ thư mục tĩnh (HTML, CSS, Images, JS)
+// Thư mục tĩnh
 app.use(express.static(path.join(__dirname)));
 app.use('/image', express.static(path.join(__dirname, 'image')));
 
-// 2. KẾT NỐI CSDL MYSQL (DÙNG PROMISE)
+// Kết nối CSDL
+// Kết nối CSDL bảo mật hơn, không để lộ password mặc định trong code
 const db = mysql.createPool({
-    host: process.env.DB_HOST || 'localhost',
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASS || '1234',
-    database: process.env.DB_NAME || 'security_demo',
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS,
+    database: process.env.DB_NAME,
     waitForConnections: true,
     connectionLimit: 10,
-    queueLimit: 0,
     charset: 'utf8mb4'
 });
 
 db.getConnection()
     .then(async conn => {
-        console.log('✅ Kết nối thành công đến MySQL Database: security_demo');
-        
-        // Tự động khởi tạo tài khoản Admin an toàn từ biến môi trường nếu chưa tồn tại
+        console.log('🔒 [SECURE SERVER] Kết nối thành công đến MySQL Database: security_demo');
         try {
             const adminUser = process.env.ADMIN_USERNAME || 'admin';
             const adminPass = process.env.ADMIN_PASSWORD || '1234';
-
             const [adminCheck] = await conn.query(`SELECT id FROM users WHERE username = ?`, [adminUser]);
             if (adminCheck.length === 0) {
                 const hashedPassword = await bcrypt.hash(adminPass, 10);
@@ -58,19 +53,14 @@ db.getConnection()
                     `INSERT INTO users (username, password_hash, role, fullname, phone) VALUES (?, ?, ?, ?, ?)`,
                     [adminUser, hashedPassword, 'Admin', 'Quản Trị Viên Bông Trà', '0768530492']
                 );
-                console.log('🔒 Đã khởi tạo tài khoản Admin an toàn thành công!');
             }
         } catch (seedErr) {
-            console.error('Lỗi khởi tạo tài khoản admin:', seedErr.message);
+            console.error('Lỗi khởi tạo admin:', seedErr.message);
         }
-
         conn.release();
     })
-    .catch(err => {
-        console.error('❌ Lỗi kết nối MySQL Database:', err.message);
-    });
+    .catch(err => console.error('❌ Lỗi kết nối MySQL:', err.message));
 
-// 3. CẤU HÌNH NODEMAILER GỬI MAIL CSKH
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -79,21 +69,7 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-// ==================== THỰC NGHIỆM SQL INJECTION & BẢO MẬT ====================
-
-// 1. Nhánh không an toàn (String Concatenation) - Minh chứng lỗ hổng SQLi
-app.get('/api/unsafe-search', async (req, res) => {
-    const productName = req.query.name || '';
-    try {
-        const query = `SELECT * FROM products WHERE name LIKE '%${productName}%'`;
-        const [rows] = await db.query(query);
-        res.json({ success: true, count: rows.length, data: rows });
-    } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
-    }
-});
-
-// 2. Nhánh an toàn (Prepared Statement) + Tích hợp xử lý lỗi an toàn (Bước 6)
+// ==================== KHỐI AN TOÀN (PREPARED STATEMENT) ====================
 app.get('/api/safe-search', async (req, res) => {
     const productName = req.query.name || '';
     try {
@@ -101,17 +77,12 @@ app.get('/api/safe-search', async (req, res) => {
         const [rows] = await db.query(query, [`%${productName}%`]);
         res.json({ success: true, count: rows.length, data: rows });
     } catch (err) {
-        // Ghi log chi tiết phục vụ quản trị viên phía server (Ẩn khỏi client)
-        console.error('[Database Error Log]:', err.message); 
-        // Phản hồi đã làm sạch cho client, ngăn chặn Error-based SQL Injection
-        res.status(500).json({ 
-            success: false, 
-            error: "Đã xảy ra lỗi hệ thống, vui lòng thử lại sau." 
-        });
+        console.error('[Database Error Log]:', err.message);
+        res.status(500).json({ success: false, error: "Đã xảy ra lỗi hệ thống, vui lòng thử lại sau." });
     }
 });
 
-// 4. ROUTING HTML
+// ==================== ROUTING HTML ====================
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 app.get('/gioi-thieu', (req, res) => res.sendFile(path.join(__dirname, 'gioi-thieu.html')));
 app.get('/menu', (req, res) => res.sendFile(path.join(__dirname, 'menu.html')));
@@ -129,32 +100,26 @@ app.get('/tai-khoan', (req, res) => res.sendFile(path.join(__dirname, 'tai-khoan
 app.get('/don-mua', (req, res) => res.sendFile(path.join(__dirname, 'don-mua.html')));
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'admin.html')));
 
-// 5. REST APIs DỮ LIỆU
+// ==================== REST APIS DỮ LIỆU ĐẦY ĐỦ ====================
 app.get('/api/products/bestseller', async (req, res) => {
     try {
         const [rows] = await db.query(`SELECT * FROM products WHERE is_bestseller = 1`);
         res.json(rows);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+    } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.get('/api/products/all', async (req, res) => {
     try {
         const [rows] = await db.query(`SELECT * FROM products`);
         res.json(rows);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+    } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.get('/api/news', async (req, res) => {
     try {
         const [rows] = await db.query(`SELECT * FROM news ORDER BY id DESC`);
         res.json(rows);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+    } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.get('/api/news/:id', async (req, res) => {
@@ -162,103 +127,63 @@ app.get('/api/news/:id', async (req, res) => {
         const [rows] = await db.query(`SELECT * FROM news WHERE id = ?`, [req.params.id]);
         if (rows.length === 0) return res.status(404).json({ error: "Không tìm thấy bài viết" });
         res.json(rows[0]);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+    } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.get('/api/banners', async (req, res) => {
     try {
         const [rows] = await db.query(`SELECT * FROM banners`);
         res.json(rows);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+    } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.get('/api/stores', async (req, res) => {
     try {
         const [rows] = await db.query(`SELECT * FROM stores`);
         res.json(rows);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+    } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.get('/api/about', async (req, res) => {
     try {
         const [rows] = await db.query(`SELECT * FROM about_info LIMIT 1`);
         res.json(rows[0] || {});
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+    } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.get('/api/toppings', async (req, res) => {
     try {
         const [rows] = await db.query(`SELECT * FROM toppings`);
         res.json(rows);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+    } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// 6. API TIẾP NHẬN FORM LIÊN HỆ VÀ GỬI MAIL CSKH
+// Liên hệ & Gửi Mail
 app.post('/api/contact', async (req, res) => {
     const { fullname, email, phone, is_store_feedback, message } = req.body;
-
     if (!fullname || !email || !phone || !message) {
-        return res.status(400).json({
-            success: false,
-            message: 'Vui lòng điền đầy đủ thông tin bắt buộc!'
-        });
+        return res.status(400).json({ success: false, message: 'Vui lòng điền đầy đủ thông tin bắt buộc!' });
     }
-
     try {
-        const sqlInsert = `INSERT INTO contacts (fullname, email, phone, message) VALUES (?, ?, ?, ?)`;
-        await db.query(sqlInsert, [fullname, email, phone, message]);
-
+        await db.query(`INSERT INTO contacts (fullname, email, phone, message) VALUES (?, ?, ?, ?)`, [fullname, email, phone, message]);
         try {
             const storeFeedbackNote = is_store_feedback ? '<strong>[Lưu ý: Khách hàng muốn góp ý cửa hàng cụ thể]</strong><br>' : '';
-            const mailOptions = {
+            await transporter.sendMail({
                 from: '"Bông Trà Website" <kimmngann10102005@gmail.com>',
                 to: 'nenal82786@deertees.com',
                 subject: `[BÔNG TRÀ CSKH] Lời nhắn mới từ ${fullname}`,
-                html: `
-                    <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #006030; border-radius: 10px; max-width: 600px; color: #333;">
-                        <h2 style="color: #006030; margin-top: 0;">YÊU CẦU LIÊN HỆ MỚI</h2>
-                        <p>${storeFeedbackNote}</p>
-                        <p><strong>Họ và tên:</strong> ${fullname}</p>
-                        <p><strong>Địa chỉ Email:</strong> ${email}</p>
-                        <p><strong>Số điện thoại:</strong> ${phone}</p>
-                        <p><strong>Nội dung lời nhắn:</strong></p>
-                        <blockquote style="background: #f8f9fa; padding: 12px; border-left: 4px solid #006030; margin: 10px 0;">
-                            ${message.replace(/\n/g, '<br>')}
-                        </blockquote>
-                    </div>
-                `
-            };
-            await transporter.sendMail(mailOptions);
-        } catch (mailError) {
-            console.error('⚠ Lỗi gửi Email:', mailError.message);
-        }
-
-        return res.json({
-            success: true,
-            message: 'Gửi thông tin liên hệ thành công! Bông Trà sẽ phản hồi sớm nhất.'
-        });
+                html: `<p>${storeFeedbackNote}</p><p><strong>Họ tên:</strong> ${fullname}</p><p><strong>Email:</strong> ${email}</p><p><strong>SĐT:</strong> ${phone}</p><p><strong>Lời nhắn:</strong> ${message}</p>`
+            });
+        } catch (mailError) { console.error('Lỗi gửi mail:', mailError.message); }
+        res.json({ success: true, message: 'Gửi liên hệ thành công!' });
     } catch (dbError) {
-        return res.status(500).json({
-            success: false,
-            message: 'Lỗi hệ thống CSDL!'
-        });
+        res.status(500).json({ success: false, message: 'Lỗi CSDL!' });
     }
 });
 
-// 7. BẢO MẬT AES-256-GCM DÀNH CHO USER
+// Mã hóa AES
 const ALGORITHM = 'aes-256-gcm';
 const KEY = Buffer.from(process.env.AES_SECRET_KEY || '603deb1015ca71be2b73aef0857d77811f352c073b6108d72d9810a30914dff4', 'hex');
-
 function encryptAES(text) {
     const iv = crypto.randomBytes(12);
     const cipher = crypto.createCipheriv(ALGORITHM, KEY, iv);
@@ -267,199 +192,32 @@ function encryptAES(text) {
     return { encryptedData: encrypted, iv: iv.toString('hex'), authTag: cipher.getAuthTag().toString('hex') };
 }
 
-function decryptAES(encryptedData, ivHex, authTagHex) {
-    try {
-        const decipher = crypto.createDecipheriv(ALGORITHM, KEY, Buffer.from(ivHex, 'hex'));
-        decipher.setAuthTag(Buffer.from(authTagHex, 'hex'));
-        let decrypted = decipher.update(encryptedData, 'hex', 'utf8');
-        decrypted += decipher.final('utf8');
-        return decrypted;
-    } catch (error) {
-        return "Lỗi giải mã (Dữ liệu bị vi phạm tính toàn vẹn)";
-    }
-}
-
-// ==================== RBAC MIDDLEWARE & ADMIN APIs ====================
+// RBAC & RBA Middleware
 function verifyAdminRole(req, res, next) {
     const userRole = req.headers['x-user-role'] || 'User';
-    if (userRole === 'Admin') {
-        next();
-    } else {
-        return res.status(403).json({ success: false, error: "403 Forbidden: Tài khoản không có quyền truy cập tài nguyên quản trị!" });
-    }
+    if (userRole === 'Admin') next();
+    else res.status(403).json({ success: false, error: "403 Forbidden: Không có quyền quản trị!" });
 }
 
-// Cấu hình Express tin tưởng proxy để đọc chính xác IP từ Header mô phỏng
 app.set('trust proxy', true);
 
-
-// ==================== TẦNG RBA (RISK-BASED AUTHENTICATION) & GEOIP-LITE ====================
 function rbaIpCheckMiddleware(req, res, next) {
     let clientIp = req.headers['x-forwarded-for'] || req.ip || req.socket.remoteAddress || '';
-    
-    if (clientIp.includes('::ffff:')) {
-        clientIp = clientIp.split(':').pop();
-    }
-    // [BỔ SUNG BLOCK 2] Nếu chạy local (loopback), mô phỏng IP quốc tế hoặc IP bị chặn để test GeoIP-Lite
-    if (clientIp === '::1' || clientIp === '127.0.0.1') {
-        clientIp = '8.8.8.8'; // Mặc định test IP mẫu (hoặc thay đổi IP tùy ý để kiểm thử block)
-    }
+    if (clientIp.includes('::ffff:')) clientIp = clientIp.split(':').pop();
+    if (clientIp === '::1' || clientIp === '127.0.0.1') clientIp = '8.8.8.8';
 
-    const isAllowed = evaluateIpPolicy(clientIp);
-
-    if (!isAllowed) {
-        console.warn(`[RBA / GeoIP Security Alert] Chặn yêu cầu từ IP rủi ro cao / vị trí bị hạn chế: ${clientIp}`);
-        return res.status(403).json({
-            success: false,
-            error: "403 Forbidden: RBA & GeoIP phát hiện bất thường - Truy cập từ địa chỉ IP hoặc quốc gia nằm trong danh sách chặn!"
-        });
+    const geo = geoip.lookup(clientIp);
+    if (geo && ['CN'].includes(geo.country)) {
+        return res.status(403).json({ success: false, error: "403 Forbidden: Truy cập từ quốc gia bị hạn chế!" });
     }
-
     next();
 }
 
-// Hàm chính sách đánh giá rủi ro IP kết hợp GeoIP-Lite (Policy Evaluation Engine)
-function evaluateIpPolicy(ip) {
-    // [BỔ SUNG BLOCK 2] Sử dụng geoip-lite tra cứu thông tin quốc gia dựa trên IP
-    const geo = geoip.lookup(ip);
-    
-    // Danh sách các mã quốc gia bị hạn chế / chặn truy cập theo chính sách bảo mật (Ví dụ: 'CN', 'XX', ...)
-    const blockedCountries = ['CN']; 
-    
-    if (geo && blockedCountries.includes(geo.country)) {
-        console.log(`[GeoIP-Lite] Chặn IP ${ip} thuộc quốc gia: ${geo.country}`);
-        return false; // Thuộc quốc gia bị chặn -> Từ chối
-    }
-
-    // Danh sách đen các IP độc hại cụ thể
-    const blacklistedIps = ['203.0.113.5', '1.1.1.1']; 
-    if (blacklistedIps.includes(ip)) {
-        return false; // Mức độ rủi ro cao -> Từ chối truy cập
-    }
-    
-    return true; // Hợp lệ -> Cho phép tiếp tục
-}
-
-// Lấy danh sách users (Kiểm thử RBAC)
+// Admin APIs
 app.get('/api/admin/users', verifyAdminRole, async (req, res) => {
     try {
         const [rows] = await db.query(`SELECT id, username, fullname, phone, role FROM users`);
         res.json({ success: true, data: rows });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
-// Quản lý Sản phẩm (Thêm & Xóa)
-app.post('/api/admin/products', verifyAdminRole, async (req, res) => {
-    const { name, price, category, description, image_url, is_bestseller } = req.body;
-    try {
-        const sql = `INSERT INTO products (name, price, category, description, image_url, is_bestseller) VALUES (?, ?, ?, ?, ?, ?)`;
-        await db.query(sql, [name, price, category, description, image_url, is_bestseller || 0]);
-        res.json({ success: true, message: "Thêm sản phẩm thành công!" });
-    } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
-    }
-});
-
-app.delete('/api/admin/products/:id', verifyAdminRole, async (req, res) => {
-    try {
-        await db.query(`DELETE FROM products WHERE id = ?`, [req.params.id]);
-        res.json({ success: true, message: "Xóa sản phẩm thành công!" });
-    } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
-    }
-});
-
-// Xem danh sách thông tin liên hệ (CSKH)
-app.get('/api/admin/contacts', verifyAdminRole, async (req, res) => {
-    try {
-        const [rows] = await db.query(`SELECT * FROM contacts ORDER BY id DESC`);
-        res.json(rows);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
-// Đăng thêm sự kiện / tin tức / khuyến mãi
-app.post('/api/admin/news', verifyAdminRole, async (req, res) => {
-    const { title, content, image_url, category, author, hashtag } = req.body;
-    try {
-        const created_date = new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
-        const sql = `INSERT INTO news (title, content, image_url, category, author, hashtag, created_date) VALUES (?, ?, ?, ?, ?, ?, ?)`;
-        await db.query(sql, [title, content, image_url, category || 'Tin Tức', author || 'Bông Trà', hashtag || '', created_date]);
-        res.json({ success: true, message: "Đăng bài viết/sự kiện thành công!" });
-    } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
-    }
-});
-
-// 8. API ĐĂNG KÝ
-app.post('/api/register', async (req, res) => {
-    const { fullname, phone, username, password, sensitiveData, role } = req.body;
-    try {
-        const [existing] = await db.query(`SELECT id FROM users WHERE username = ?`, [username]);
-        if (existing.length > 0) {
-            return res.status(400).json({ error: "Tên đăng nhập đã tồn tại, vui lòng thay đổi." });
-        }
-
-        const passwordHash = await bcrypt.hash(password, 10);
-        const encrypted = encryptAES(sensitiveData || '');
-        
-        const sql = `INSERT INTO users (username, password_hash, role, fullname, phone, sensitive_data_encrypted, iv, auth_tag) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
-        await db.query(sql, [username, passwordHash, role || 'User', fullname || '', phone || '', encrypted.encryptedData, encrypted.iv, encrypted.authTag]);
-        
-        res.json({ message: "Đăng ký an toàn thành công!", username: username });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// 9. API ĐĂNG NHẬP CHUẨN (Đã tích hợp RBA Check IP)
-app.post('/api/login', rbaIpCheckMiddleware, async (req, res) => {
-    const { username, password } = req.body;
-    try {
-        const [results] = await db.query(`SELECT * FROM users WHERE username = ?`, [username]);
-        if (results.length === 0) {
-            return res.status(400).json({ error: "Sai tên đăng nhập hoặc mật khẩu, vui lòng kiểm tra lại!" });
-        }
-        
-        const user = results[0];
-        const isMatch = await bcrypt.compare(password, user.password_hash);
-        if (!isMatch) {
-            return res.status(400).json({ error: "Sai tên đăng nhập hoặc mật khẩu, vui lòng kiểm tra lại!" });
-        }
-
-        res.json({ message: "Đăng nhập thành công!", username: user.username, role: user.role });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// API phụ tương thích
-app.post('/api/secure-login', rbaIpCheckMiddleware, async (req, res) => {
-    const { username, password } = req.body;
-    try {
-        const [results] = await db.query(`SELECT * FROM users WHERE username = ?`, [username]);
-        if (results.length === 0) return res.status(401).json({ message: "Sai tài khoản hoặc mật khẩu!" });
-        const user = results[0];
-        const isMatch = await bcrypt.compare(password, user.password_hash);
-        if (!isMatch) return res.status(401).json({ message: "Sai tài khoản hoặc mật khẩu!" });
-
-        const decryptedPII = user.sensitive_data_encrypted ? decryptAES(user.sensitive_data_encrypted, user.iv, user.auth_tag) : '';
-        res.json({ message: "Đăng nhập thành công!", username: user.username, user: { id: user.id, username: user.username, role: user.role, sensitiveData: decryptedPII } });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// ==================== BỔ SUNG API QUẢN TRỊ ADMIN ====================
-
-// 1. Quản lý Sản Phẩm (Thêm, Sửa, Xóa)
-app.get('/api/admin/products', verifyAdminRole, async (req, res) => {
-    try {
-        const [rows] = await db.query(`SELECT * FROM products ORDER BY id DESC`);
-        res.json(rows);
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
@@ -472,23 +230,20 @@ app.post('/api/admin/products', verifyAdminRole, async (req, res) => {
     } catch (err) { res.status(500).json({ success: false, error: err.message }); }
 });
 
-app.put('/api/admin/products/:id', verifyAdminRole, async (req, res) => {
-    const { name, price, category, description, image_url } = req.body;
-    try {
-        await db.query(`UPDATE products SET name = ?, price = ?, category = ?, description = ?, image_url = ? WHERE id = ?`, 
-            [name, price, category, description, image_url, req.params.id]);
-        res.json({ success: true, message: "Cập nhật sản phẩm thành công!" });
-    } catch (err) { res.status(500).json({ success: false, error: err.message }); }
-});
-
 app.delete('/api/admin/products/:id', verifyAdminRole, async (req, res) => {
     try {
         await db.query(`DELETE FROM products WHERE id = ?`, [req.params.id]);
         res.json({ success: true, message: "Xóa sản phẩm thành công!" });
-    } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+    } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// 2. Quản lý Tin Tức / Khuyến Mãi (Thêm, Sửa, Xóa)
+app.get('/api/admin/contacts', verifyAdminRole, async (req, res) => {
+    try {
+        const [rows] = await db.query(`SELECT * FROM contacts ORDER BY id DESC`);
+        res.json(rows);
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 app.post('/api/admin/news', verifyAdminRole, async (req, res) => {
     const { title, content, image_url, category, author, hashtag } = req.body;
     try {
@@ -499,92 +254,39 @@ app.post('/api/admin/news', verifyAdminRole, async (req, res) => {
     } catch (err) { res.status(500).json({ success: false, error: err.message }); }
 });
 
-app.delete('/api/admin/news/:id', verifyAdminRole, async (req, res) => {
+// Đăng ký & Đăng nhập chuẩn an toàn
+app.post('/api/register', async (req, res) => {
+    const { fullname, phone, username, password, sensitiveData, role } = req.body;
     try {
-        await db.query(`DELETE FROM news WHERE id = ?`, [req.params.id]);
-        res.json({ success: true, message: "Xóa bài viết thành công!" });
-    } catch (err) { res.status(500).json({ error: err.message }); }
+        const [existing] = await db.query(`SELECT id FROM users WHERE username = ?`, [username]);
+        if (existing.length > 0) return res.status(400).json({ error: "Tên đăng nhập đã tồn tại!" });
+
+        const passwordHash = await bcrypt.hash(password, 10);
+        const encrypted = encryptAES(sensitiveData || '');
+        await db.query(`INSERT INTO users (username, password_hash, role, fullname, phone, sensitive_data_encrypted, iv, auth_tag) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, 
+            [username, passwordHash, role || 'User', fullname || '', phone || '', encrypted.encryptedData, encrypted.iv, encrypted.authTag]);
+        
+        res.json({ message: "Đăng ký an toàn thành công!", username: username });
+    } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// 3. Quản lý Đánh Giá (Xem tất cả & Phản hồi)
-app.get('/api/admin/reviews', verifyAdminRole, async (req, res) => {
-    try {
-        const [rows] = await db.query(`SELECT * FROM reviews ORDER BY id DESC`).catch(() => [[
-            { id: 1, user: 'an2', product: 'Trà Sữa Ô Long', rating: 5, comment: 'Trà rất thơm, đậm vị!', reply: '' }
-        ]]);
-        res.json(rows);
-    } catch (err) { res.status(500).json({ error: err.message }); }
-});
-
-app.post('/api/admin/reviews/reply', verifyAdminRole, async (req, res) => {
-    const { reviewId, replyText } = req.body;
-    try {
-        res.json({ success: true, message: "Đã gửi phản hồi đánh giá thành công!" });
-    } catch (err) { res.status(500).json({ error: err.message }); }
-});
-
-// 4. Xem danh sách CSKH (Form liên hệ)
-app.get('/api/admin/contacts', verifyAdminRole, async (req, res) => {
-    try {
-        const [rows] = await db.query(`SELECT * FROM contacts ORDER BY id DESC`);
-        res.json(rows);
-    } catch (err) { res.status(500).json({ error: err.message }); }
-});
-// ==================== BỔ SUNG API QUẢN LÝ TÀI KHOẢN & QUYỀN ĐƯỢC QUÊN ====================
-
-// 1. API Cập nhật thông tin cá nhân
-app.put('/api/user/update', async (req, res) => {
-    const { username, fullname, phone } = req.body;
-    try {
-        await db.query(`UPDATE users SET fullname = ?, phone = ? WHERE username = ?`, [fullname, phone, username]);
-        res.json({ success: true, message: "Cập nhật thông tin thành công!" });
-    } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
-    }
-});
-
-// 2. API Đổi mật khẩu an toàn
-app.post('/api/user/change-password', async (req, res) => {
-    const { username, oldPassword, newPassword } = req.body;
+app.post('/api/login', rbaIpCheckMiddleware, async (req, res) => {
+    const { username, password } = req.body;
     try {
         const [results] = await db.query(`SELECT * FROM users WHERE username = ?`, [username]);
-        if (results.length === 0) return res.status(404).json({ success: false, error: "Không tìm thấy người dùng!" });
+        if (results.length === 0) return res.status(400).json({ error: "Sai tên đăng nhập hoặc mật khẩu!" });
         
         const user = results[0];
-        const isMatch = await bcrypt.compare(oldPassword, user.password_hash);
-        if (!isMatch) return res.status(400).json({ success: false, error: "Mật khẩu hiện tại không chính xác!" });
+        const isMatch = await bcrypt.compare(password, user.password_hash);
+        if (!isMatch) return res.status(400).json({ error: "Sai tên đăng nhập hoặc mật khẩu!" });
 
-        const hashedNewPass = await bcrypt.hash(newPassword, 10);
-        await db.query(`UPDATE users SET password_hash = ? WHERE username = ?`, [hashedNewPass, username]);
-        
-        res.json({ success: true, message: "Đổi mật khẩu thành công!" });
-    } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
-    }
+        res.json({ message: "Đăng nhập thành công!", username: user.username, role: user.role });
+    } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// 3. API Yêu cầu xóa dữ liệu cá nhân (Quyền được quên / Right to be forgotten)
-app.delete('/api/user/delete-data', async (req, res) => {
-    const { username } = req.body;
-    try {
-        // Thực hiện xóa dữ liệu người dùng khỏi bảng users
-        await db.query(`DELETE FROM users WHERE username = ?`, [username]);
-        res.json({ success: true, message: "Đã xóa toàn bộ dữ liệu cá nhân theo yêu cầu thành công." });
-    } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
-    }
-});
-
-// KHỞI CHẠY HTTP SERVER 
-app.listen(PORT, () => {
-    console.log(`================================================`);
-    console.log(`⚠️ Insecure Server (HTTP) đang chạy tại: http://localhost:${PORT}`);
-    console.log(`================================================`);
-});
-
-// KHỞI CHẠY HTTPS SERVER (TLS 1.3)
+// Khởi chạy HTTPS Server an toàn
 https.createServer(options, app).listen(HTTPS_PORT, () => {
-    console.log(`================================================`);
-    console.log(`🚀 Secure Server (TLS 1.3) đang chạy tại: https://localhost:${HTTPS_PORT}`);
-    console.log(`================================================`);
+    console.log(`========================================================`);
+    console.log(`🚀 SECURE SERVER (TLS 1.3) đang chạy tại: https://localhost:${HTTPS_PORT}`);
+    console.log(`========================================================`);
 });
